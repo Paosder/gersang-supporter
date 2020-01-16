@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.paths",
   "name": "gersang-supporter",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "author": "Paosder",
   "dependencies": {
@@ -42,7 +42,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "license": "eula.html"
     },
     "directories": {
       "buildResources": "./public",
