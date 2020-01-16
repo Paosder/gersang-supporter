@@ -1,26 +1,54 @@
 import React from 'react';
-import logo from './logo.svg';
+import { ipcRenderer } from 'electron';
+import { Helmet } from 'react-helmet';
+import {
+  Route, HashRouter,
+} from 'react-router-dom';
+import { Main, Configuration } from './routes';
+
 import './App.css';
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+// const fs = require('fs');
+
+// const root = fs.readdirSync('/');
+
+
+// const clicked = () => {
+//   const notification = new Notification('this si title', {
+//     body: 'TEST TEST',
+//   });
+// };
+
+ipcRenderer.on('hide', () => {
+  const notification = new Notification('HIDE', {
+    body: 'TEST TESasdsadT',
+  });
+});
+
+// const [pingpong, setPingpong] = useState<string>('ttts');
+// useEffect(() => {
+//   ipcRenderer.send('asynchronous-message', 'ping');
+// }, []);
+
+// useEffect(() => {
+//   ipcRenderer.on('asynchronous-reply', (event, arg) => {
+//     setPingpong(`${arg}`);
+//     setTimeout(() => {
+//       ipcRenderer.send('asynchronous-message', 'ping');
+//     }, 1000);
+//   });
+// }, []);
+
+const App: React.FC = () => (
+  <div className="App">
+    <Helmet>
+      <title>Gersang Supporter</title>
+    </Helmet>
+    <HashRouter>
+      <Route path="/" exact component={Main} />
+      <Route path="/configuration" component={Configuration} />
+    </HashRouter>
+  </div>
+);
 
 export default App;
