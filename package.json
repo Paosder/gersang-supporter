@@ -5,7 +5,6 @@
   "private": true,
   "author": "Paosder",
   "dependencies": {
-    "electron-debug": "^3.0.1",
     "fs-jetpack": "^2.2.3",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -18,14 +17,14 @@
   "scripts": {
     "dev": "concurrently \"yarn front:start\" \"yarn electron:dev\"",
     "front:start": "craco start",
-    "electron:dev": "tsc -w main/electron.ts --outDir build",
+    "electron:dev": "cross-env NODE_ENV=development webpack --config webpack.config.electron.js --watch",
     "electron:start-prod": "cross-env NODE_ENV=production electron ./build/electron.js",
-    "electron:build": "tsc main/electron.ts --outDir build",
-    "start": "cross-env NODE_ENV=development ELECTRON_START_URL=http://localhost:3000 nodemon --watch build/electron.js --exec \"electron ./build/electron.js\"",
+    "electron:build": "webpack --config webpack.config.electron.js",
+    "start": "cross-env NODE_ENV=development ELECTRON_START_URL=http://localhost:3000 nodemon --watch public/electron.js --exec \"electron ./public/electron.js\"",
     "build:win64": "electron-builder build --win --x64",
     "build:front": "craco build",
     "build:native": ".\\node_modules\\.bin\\electron-rebuild.cmd",
-    "build": "cross-env NODE_ENV=production yarn build:front && yarn electron:build && yarn build:win64",
+    "build": "cross-env NODE_ENV=production yarn electron:build && yarn build:front && yarn build:win64",
     "test": "craco test"
   },
   "build": {
@@ -47,10 +46,10 @@
     },
     "directories": {
       "buildResources": "./public",
-      "output": "release/",
-      "app": "."
+      "output": "release/"
     },
     "files": [
+      "!**/*.js.map",
       "!**/node_modules/@babel${/*}"
     ]
   },
@@ -70,10 +69,6 @@
     "@babel/core": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
     "@craco/craco": "^5.6.3",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/jest": "^24.0.0",
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
@@ -92,6 +87,7 @@
     "eslint-plugin-react-perf": "^3.2.3",
     "nodemon": "^2.0.2",
     "react-scripts": "3.3.0",
+    "terser-webpack-plugin": "^2.3.2",
     "ts-loader": "^6.2.1",
     "typescript": "~3.7.2",
     "webpack-cli": "^3.3.10",

@@ -38,7 +38,7 @@ require('winax');
 // debug();
 let cnt = 0;
 ipcMain.on('asynchronous-message', (event, arg) => {
-  console.log(arg);
+  // console.log(arg);
   cnt += 1;
   event.reply('asynchronous-reply', `pong${cnt}`);
 });

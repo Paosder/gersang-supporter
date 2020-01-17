@@ -13,6 +13,8 @@
 /dist
 /temp
 /release
+/public/electron.js
+/public/electron.js.map
 
 # misc
 .DS_Store
