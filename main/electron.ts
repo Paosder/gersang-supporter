@@ -1,11 +1,16 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  app, BrowserWindow, ipcMain, Menu, Tray,
+  app, BrowserWindow, ipcMain, Menu, Tray, dialog,
 } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as regedit from 'regedit';
 import copy from './copy-content';
+
+const isPrimaryInstance = app.requestSingleInstanceLock();
+
+if (!isPrimaryInstance) process.exit(0);
+
 
 if (process.env.NODE_ENV !== 'development') {
   copy(path.join('node_modules/regedit/vbs'), path.join(path.dirname(app.getPath('exe')), './registry'));
@@ -28,64 +33,98 @@ regedit.putValue({
   console.log('ttt');
 });
 
-// const debug = require('electron-debug');
+// ///////////////////////////////////////////////////////
+// common const ----------------------------------------
+
+const baseUrl = process.env.ELECTRON_START_URL || url.format({
+  pathname: path.join(__dirname, '../build/index.html'),
+  protocol: 'file:',
+  slashes: true,
+});
+
+const trayImg = process.env.NODE_ENV === 'development' ? path.join(__dirname, '../public/logo.jpg') : path.join(__dirname, './logo.jpg');
+
+// ///////////////////////////////////////////////////////
+// IE Communications using ActiveX ---------------------
+
 require('winax');
 
 // const IE = new ActiveXObject('InternetExplorer.Application');
 // IE.visible = true;
 // IE.navigate('https://www.gersang.co.kr');
 
-// debug();
-let cnt = 0;
-ipcMain.on('asynchronous-message', (event, arg) => {
-  // console.log(arg);
-  cnt += 1;
-  event.reply('asynchronous-reply', `pong${cnt}`);
-});
 
 // ///////////////////////////////////////////////////////
+// Main ----------------------------------
+
 
 let tray: Tray = null;
 
 let mainWindow: Electron.BrowserWindow;
 
-function createWindow() {
-  const trayImg = process.env.NODE_ENV === 'development' ? path.join(__dirname, '../public/logo512.png') : path.join(__dirname, './logo512.png');
+
+const createWindow = () => {
   console.log(trayImg);
   tray = new Tray(trayImg);
   const contextmenu = Menu.buildFromTemplate([
     {
-      label: 'Item1',
-      type: 'radio',
-    },
-    {
-      label: 'Item2',
-      type: 'radio',
-      checked: true,
-    },
-    {
-      label: 'quit',
+      label: '1번 계정으로 시작',
       type: 'normal',
       click: () => {
-        app.quit();
+        dialog.showMessageBox(mainWindow, {
+          title: '일해라 핫산',
+          type: 'warning',
+          message: '기능 준비중입니다 ㅠㅠ',
+        });
+      },
+    },
+    {
+      label: '2번 계정으로 시작',
+      type: 'normal',
+      click: () => {
+        dialog.showMessageBox(mainWindow, {
+          title: '일해라 핫산',
+          type: 'warning',
+          message: '기능 준비중입니다 ㅠㅠ',
+        });
+      },
+    },
+    {
+      label: '3번 계정으로 시작',
+      type: 'normal',
+      click: () => {
+        dialog.showMessageBox(mainWindow, {
+          title: '일해라 핫산',
+          type: 'warning',
+          message: '기능 준비중입니다 ㅠㅠ',
+        });
+      },
+    },
+    {
+      label: '종료',
+      type: 'normal',
+      click: () => {
+        process.exit(0);
+        // app.quit();
       },
     },
   ]);
   tray.on('click', () => {
     mainWindow.show();
   });
-  tray.setToolTip('this is app');
+  tray.setToolTip('거상 서포터');
   tray.setContextMenu(contextmenu);
 
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 400,
+    height: 290,
     webPreferences: {
       nodeIntegration: true,
       devTools: true,
     },
     maximizable: false,
     resizable: false,
+    icon: trayImg,
   });
 
   mainWindow.on('close', (event) => {
@@ -98,22 +137,13 @@ function createWindow() {
     }
   });
 
-  // mainWindow.on('before-quit', () => { quitting = true; });
-  // const startUrl = 'http://localhost:3000';
   mainWindow.setMenu(null);
-  const startUrl = process.env.ELECTRON_START_URL || url.format({
-    pathname: path.join(__dirname, '../build/index.html'),
-    protocol: 'file:',
-    slashes: true,
-  });
+  const startUrl = `${baseUrl}#/main`;
   mainWindow.loadURL(startUrl);
-  // if (process.env.ELECTRON_START_URL) {
-  // } else {
-  //   console.log(startUrl);
-  //   mainWindow.loadFile('./index.html');
-  // }
-  // mainWindow.setProgressBar(0.75);
-}
+
+
+  app.setAppUserModelId('거상 서포터');
+};
 
 app.on('ready', createWindow);
 
@@ -121,4 +151,86 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+app.on('second-instance', (event, commandLine, workingDirectory) => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+    mainWindow.focus();
+  }
+});
+
+// mainWindow.setProgressBar(0.75);
+
+// ///////////////////////////////////////////////////////
+// IPC Communications ----------------------------------
+
+ipcMain.on('request-login', (event, arg) => {
+  console.log(arg);
+  event.reply('request-login', {
+    status: true,
+    reason: 'my mind',
+  });
+
+  const otpWindow = new BrowserWindow({
+    width: 160,
+    height: 90,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    parent: mainWindow,
+    modal: true,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+    icon: trayImg,
+  });
+  otpWindow.setMenu(null);
+  const otpUrl = `${baseUrl}#/otp`;
+  otpWindow.loadURL(otpUrl);
+});
+
+ipcMain.on('request-logout', (event, arg) => {
+  console.log('logout success!');
+  event.reply('request-logout', {
+    status: true,
+    reason: 'logout',
+  });
+});
+
+ipcMain.on('gersang-directory', (event, index) => {
+  console.log(index);
+  const res = dialog.showOpenDialogSync(mainWindow, {
+    title: '거상 설치 경로 선택',
+    defaultPath: 'C:\\AKInteractive',
+    properties: ['openDirectory'],
+  });
+  if (res && res.length > 0) {
+    event.reply('gersang-directory', {
+      path: res[0],
+      index,
+    });
+  }
+});
+
+ipcMain.on('configuration', (event, arg) => {
+  const configWindow = new BrowserWindow({
+    width: 400,
+    height: 400,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    parent: mainWindow,
+    modal: true,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+    icon: trayImg,
+  });
+  configWindow.setMenu(null);
+  const configUrl = `${baseUrl}#/configuration`;
+  configWindow.loadURL(configUrl);
 });

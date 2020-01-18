@@ -6,7 +6,7 @@ module.exports = {
     "airbnb",
     "plugin:@typescript-eslint/eslint-recommended",
     "react-app",
-    "plugin:react-perf/recommended"
+    // "plugin:react-perf/recommended"
   ],
   parserOptions: {
     include: ["src/**/*.tsx", "src/**/*.ts"],
@@ -51,6 +51,7 @@ module.exports = {
     "eqeqeq": ["error", "always", {"null": "ignore"}],
     "@typescript-eslint/indent": 0,
     "import/no-extraneous-dependencies": 0,
+    "react-perf/jsx-no-new-object-as-prop": 0,
     "import/extensions": [
       "error",
       "ignorePackages",

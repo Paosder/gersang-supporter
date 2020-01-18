@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "target": "es6",
     "lib": [
@@ -21,7 +22,10 @@
     "jsx": "react"
   },
   "include": [
-    "src",
+    "src"
+  ],
+  "files": [
+    "node_modules/react-uwp/index.d.ts"
   ],
   "exclude": [
     "node_modules",

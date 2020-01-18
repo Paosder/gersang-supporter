@@ -4,7 +4,9 @@ import { Helmet } from 'react-helmet';
 import {
   Route, HashRouter,
 } from 'react-router-dom';
-import { Main, Configuration } from './routes';
+import { Theme as UWPThemeProvider, getTheme } from 'react-uwp/Theme';
+import { NotificationIcon } from '@common/icons';
+import { Main, Configuration, OTP } from './routes';
 
 import './App.css';
 
@@ -12,16 +14,11 @@ import './App.css';
 
 // const root = fs.readdirSync('/');
 
-
-// const clicked = () => {
-//   const notification = new Notification('this si title', {
-//     body: 'TEST TEST',
-//   });
-// };
-
 ipcRenderer.on('hide', () => {
-  const notification = new Notification('HIDE', {
-    body: 'TEST TESasdsadT',
+  const notification = new Notification('Gersang Supporter', {
+    icon: NotificationIcon,
+    body: '트레이 아이콘으로 숨깁니다.',
+    timestamp: 34,
   });
 });
 
@@ -44,10 +41,20 @@ const App: React.FC = () => (
     <Helmet>
       <title>Gersang Supporter</title>
     </Helmet>
-    <HashRouter>
-      <Route path="/" exact component={Main} />
-      <Route path="/configuration" component={Configuration} />
-    </HashRouter>
+    <UWPThemeProvider
+      theme={getTheme({
+        themeName: 'light', // set custom theme
+        // accent: '#0078D7', // set accent color
+        // desktopBackgroundImage: backgroundImg,
+        useFluentDesign: true,
+      })}
+    >
+      <HashRouter>
+        <Route path="/main" component={Main} />
+        <Route path="/configuration" component={Configuration} />
+        <Route path="/otp" component={OTP} />
+      </HashRouter>
+    </UWPThemeProvider>
   </div>
 );
 
