@@ -3,8 +3,6 @@ import {
   Route, Switch, RouteComponentProps,
 } from 'react-router-dom';
 import React from 'react';
-import path from 'path';
-import url from 'url';
 import styled from 'styled-components';
 import IconButton from 'react-uwp/IconButton';
 import { ThemeProps } from 'react-uwp';

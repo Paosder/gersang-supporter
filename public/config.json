@@ -1,0 +1,23 @@
+{
+  "encrypted": "true",
+  "clients": [
+    {
+      "username": "",
+      "password": "",
+      "path": "C:\\AKInteractive\\Gersang-client1",
+      "alwaysSave": "false"
+    },
+    {
+      "username": "",
+      "password": "",
+      "path": "C:\\AKInteractive\\Gersang-client2",
+      "alwaysSave": "false"
+    },
+    {
+      "username": "",
+      "password": "",
+      "path": "C:\\AKInteractive\\Gersang-client2",
+      "alwaysSave": "true"
+    }
+  ]
+}
