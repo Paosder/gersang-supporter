@@ -90,7 +90,7 @@ export const setUserInfo = (username: string,
     password: encrypt(password),
     index,
   });
-  dispatch(saveConfig({}, true));
+  dispatch(saveConfig({ doEncrypt: getState().config.encrypted === 'true' }, true));
 };
 
 export type ConfigActions = {

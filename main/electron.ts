@@ -258,7 +258,7 @@ ipcMain.on('request-login', async (event, arg) => {
 홈페이지가 정상적이지 않을 수도 있습니다.
 해당 증상이 반복될 경우 denjaraos@gmail.com 으로 문의주시면 감사하겠습니다.`);
     event.reply('request-logout', {
-      status: true,
+      error: true,
       reason: 'login-failed',
     });
     return;
@@ -272,7 +272,7 @@ ipcMain.on('request-login', async (event, arg) => {
   } catch {
     IE.Application.Quit();
     event.reply('request-logout', {
-      status: true,
+      error: true,
       reason: 'login-failed',
     });
     dialog.showErrorBox('계정 오류!', '아이디 혹은 비밀번호가 틀린가봐요 T.T');
@@ -314,7 +314,7 @@ ipcMain.on('request-login', async (event, arg) => {
       });
     } else {
       mainWindow.webContents.send('request-logout', {
-        status: true,
+        error: true,
         reason: 'login-error',
       });
     }
@@ -332,7 +332,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     await waitBusy();
   } catch {
     mainWindow.webContents.send('request-logout', {
-      status: true,
+      error: true,
       reason: 'wrong-number-otp',
     });
     dialog.showErrorBox('OTP 오류!', '인증 번호가 맞지 않습니다!');
@@ -351,13 +351,17 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
 });
 
 ipcMain.on('request-logout', (event, forced?: boolean) => {
-  mainWindow.webContents.send('request-logout', {
-    status: true,
-    reason: 'cancel-otp',
-  });
   if (forced) {
+    mainWindow.webContents.send('request-logout', {
+      error: true,
+      reason: 'cancel-otp',
+    });
     dialog.showErrorBox('OTP 취소!', 'OTP 인증을 취소하였습니다.');
   } else {
+    mainWindow.webContents.send('request-logout', {
+      error: false,
+      reason: 'success-logout',
+    });
     logoutUser();
   }
 });
@@ -439,5 +443,6 @@ ipcMain.on('change-config', (event, silent: boolean) => {
   mainWindow.webContents.send('change-config'); // to refresh
   if (configWindow) {
     configWindow.webContents.send('change-config'); // to close
+    configWindow = null;
   }
 });

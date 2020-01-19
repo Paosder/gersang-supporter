@@ -64,6 +64,11 @@ interface LoginResponse {
   reason?: string;
 }
 
+interface LogoutResponse {
+  error: boolean;
+  reason?: string;
+}
+
 interface LoginFormProps {
   config: ConfigData;
   index: number;
@@ -139,8 +144,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
     const requestLoginCallback = (event: IpcRendererEvent, res: LoginResponse) => {
       if (res.status) {
         // setLoginState(LoginState.LOGIN);
-        dispatch(setStatus(index, LoginState.LOGIN));
-
         if (config.alwaysSave === 'true') {
           dispatch(setUserInfo(
             idRef.current!.getValue(),
@@ -148,22 +151,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
             index,
           ));
         }
+        dispatch(setStatus(index, LoginState.LOGIN));
       } else if (res.reason === 'OTP_AUTH_REQUIRED') {
         // setLoginState(LoginState.WAIT_OTP);
         dispatch(setStatus(index, LoginState.WAIT_OTP));
       }
     };
 
-    const requestLogoutCallback = (event: IpcRendererEvent, res: LoginResponse) => {
-      if (res.status) {
+    const requestLogoutCallback = (event: IpcRendererEvent, res: LogoutResponse) => {
+      if (res.error) {
         // setLoginState(LoginState.LOGOUT);
-        dispatch(setStatus(index, LoginState.LOGOUT));
         setPending(5);
-      } else {
-        remote.dialog.showErrorBox('알 수 없는 오류!',
-          `알 수 없는 오류입니다 T.T
-          ${JSON.stringify(res)}`);
+        // remote.dialog.showErrorBox('알 수 없는 오류!',
+        //   `알 수 없는 오류입니다 T.T
+        //   ${JSON.stringify(res)}`);
       }
+      dispatch(setStatus(index, LoginState.LOGOUT));
     };
     ipcRenderer.on('request-login', requestLoginCallback);
     ipcRenderer.on('request-logout', requestLogoutCallback);
