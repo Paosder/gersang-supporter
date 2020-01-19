@@ -5,6 +5,9 @@ import Toggle from 'react-uwp/Toggle';
 import TextBox from 'react-uwp/TextBox';
 import IconButton from 'react-uwp/IconButton';
 import Separator from 'react-uwp/Separator';
+import ToolTip from 'react-uwp/Tooltip';
+import Flyout from 'react-uwp/Flyout';
+import FlyoutContent from 'react-uwp/FlyoutContent';
 import styled from 'styled-components';
 import { ThemeProps } from 'react-uwp';
 import { ipcRenderer, remote } from 'electron';
@@ -64,12 +67,6 @@ interface ConfigData {
   password: string;
   path: string;
   alwaysSave: boolean;
-}
-
-interface ConfigClient {
-  client0: ConfigData;
-  client1: ConfigData;
-  client2: ConfigData;
 }
 
 const Configuration: React.FC<ThemeProps> = ({ theme }) => {
@@ -132,19 +129,51 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
     <ConfigLayout>
       <Header>
         <h2 style={theme?.typographyStyles?.header}>환경 설정</h2>
-        <IconButton onClick={saveAll}>SaveLegacy</IconButton>
+        <div>
+          <ToolTip content="불러오기" verticalPosition="bottom" margin={5}>
+            <IconButton disabled>DownloadLegacy</IconButton>
+          </ToolTip>
+          <ToolTip content="리셋" verticalPosition="bottom" margin={5}>
+            <IconButton disabled>ResetDrive</IconButton>
+          </ToolTip>
+          <ToolTip content="저장" verticalPosition="bottom" margin={5}>
+            <IconButton onClick={saveAll}>SaveLegacy</IconButton>
+          </ToolTip>
+        </div>
       </Header>
       <Separator />
       <OptionLayout>
         <SectionTitle>일반</SectionTitle>
-        <Toggle label="닫기 시 트레이 아이콘으로 이동" defaultToggled />
+        <Flyout>
+          <Toggle label="닫기 시 트레이 아이콘으로 이동" defaultToggled />
+          <FlyoutContent
+            show={false}
+            verticalPosition="bottom"
+            enterDelay={850}
+          >
+            활성화할 경우 닫기 시 트레이 아이콘으로 이동됩니다.
+            비활성화 할 경우 닫기 시 즉시 종료됩니다.
+          </FlyoutContent>
+        </Flyout>
         <Separator />
         <SectionTitle>보안</SectionTitle>
-        <Toggle
-          ref={encryptRef}
-          label="유저 정보 저장 (암호화)"
-          defaultToggled={config.encrypted === 'true'}
-        />
+        <Flyout>
+          <Toggle
+            ref={encryptRef}
+            label="유저 정보 저장 (암호화)"
+            defaultToggled={config.encrypted === 'true'}
+          />
+          <FlyoutContent
+            show={false}
+            verticalPosition="bottom"
+            enterDelay={850}
+          >
+            비활성화 할 경우 저장 시 암호화하지 않습니다.
+            활성화 할 경우 유저 정보를 암호화하여 저장합니다(강력히 권장).
+            사용하고 있는 PC에서만 암호를 풀 수 있습니다.
+            USB 등에 담에 사용할 경우 비활성화 하시고 나머지의 경우 보안을 위해 암호화 사용을 강력 권장합니다.
+          </FlyoutContent>
+        </Flyout>
         <Toggle label="OTP 입력 시 기본 별표 처리" defaultToggled />
         <Separator />
         <SectionTitle>경로</SectionTitle>
@@ -153,21 +182,27 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
         </DirectoryTitle>
         <Directory style={theme?.typographyStyles?.base}>
           <TextBox background="none" ref={dirRef0} />
-          <IconButton onClick={() => { getNewDirectory(0); }}>FileExplorerApp</IconButton>
+          <ToolTip content="폴더 열기">
+            <IconButton onClick={() => { getNewDirectory(0); }}>FileExplorerApp</IconButton>
+          </ToolTip>
         </Directory>
         <DirectoryTitle style={theme?.typographyStyles?.base}>
           거상 경로 2
         </DirectoryTitle>
         <Directory style={theme?.typographyStyles?.base}>
           <TextBox background="none" ref={dirRef1} />
-          <IconButton onClick={() => { getNewDirectory(1); }}>FileExplorerApp</IconButton>
+          <ToolTip content="폴더 열기">
+            <IconButton onClick={() => { getNewDirectory(1); }}>FileExplorerApp</IconButton>
+          </ToolTip>
         </Directory>
         <DirectoryTitle style={theme?.typographyStyles?.base}>
           거상 경로 3
         </DirectoryTitle>
         <Directory style={theme?.typographyStyles?.base}>
           <TextBox background="none" ref={dirRef2} />
-          <IconButton onClick={() => { getNewDirectory(2); }}>FileExplorerApp</IconButton>
+          <ToolTip content="폴더 열기">
+            <IconButton onClick={() => { getNewDirectory(2); }}>FileExplorerApp</IconButton>
+          </ToolTip>
         </Directory>
       </OptionLayout>
     </ConfigLayout>

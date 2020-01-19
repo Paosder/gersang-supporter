@@ -433,7 +433,7 @@ ipcMain.on('change-config', (event, silent: boolean) => {
     dialog.showMessageBox(mainWindow, {
       title: '저장 완료!',
       type: 'info',
-      message: '성공적으로 저장되었습니다.',
+      message: '성공적으로 저장되었어요!',
     });
   }
   mainWindow.webContents.send('change-config'); // to refresh

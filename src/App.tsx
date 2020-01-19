@@ -18,7 +18,6 @@ ipcRenderer.on('hide', () => {
   const notification = new Notification('Gersang Supporter', {
     icon: NotificationIcon,
     body: '트레이 아이콘으로 숨깁니다.',
-    timestamp: 34,
   });
 });
 

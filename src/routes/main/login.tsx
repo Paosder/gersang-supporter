@@ -17,7 +17,7 @@ import {
 } from '@common/reducer/config/action';
 import { setStatus, EnumLoginState as LoginState } from '@common/reducer/main/action';
 import { GlobalState } from '@common/reducer';
-import { encrypt, decrypt } from '@common/constant';
+import { decrypt } from '@common/constant';
 
 
 const ClientLayout = styled.div`
@@ -85,6 +85,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
       requestLogout();
       return;
     }
+    if (loginState !== LoginState.LOGOUT) return;
+
     const id = idRef.current!.getValue();
     const password = pwRef.current!.getValue();
     ipcRenderer.send('request-login', {
@@ -190,7 +192,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
         <WarnTitle>
           현재
           {loginIndex + 1}
-          클로 접속중입니다!
+          클이 활성화되어 있습니다.
         </WarnTitle>
         )}
       <TextBox
@@ -212,7 +214,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
         onKeyPress={onKeyPress}
       />
       <CheckBox
-        label="로그인에 성공할 경우 저장하기"
+        label="로그인에 성공할 경우 로그인 정보 저장하기"
         defaultChecked={config.alwaysSave === 'true'}
         onCheck={toggleSaveConfig}
         ref={saveRef}
