@@ -7,7 +7,7 @@ import Icon from 'react-uwp/Icon';
 import Button from 'react-uwp/Button';
 import styled from 'styled-components';
 import Tabs, { Tab } from 'react-uwp/Tabs';
-import { ipcRenderer, IpcRendererEvent } from 'electron';
+import { ipcRenderer, IpcRendererEvent, remote } from 'electron';
 import ProgressBar from 'react-uwp/ProgressBar';
 import ProgressRing from 'react-uwp/ProgressRing';
 import CheckBox from 'react-uwp/CheckBox';
@@ -160,7 +160,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
         dispatch(setStatus(index, LoginState.LOGOUT));
         setPending(5);
       } else {
-        alert(`unknown response!${res}`);
+        remote.dialog.showErrorBox('알 수 없는 오류!',
+          `알 수 없는 오류입니다 T.T
+          ${JSON.stringify(res)}`);
       }
     };
     ipcRenderer.on('request-login', requestLoginCallback);
@@ -218,6 +220,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
         defaultChecked={config.alwaysSave === 'true'}
         onCheck={toggleSaveConfig}
         ref={saveRef}
+        style={{
+          userSelect: 'none',
+        }}
       />
       <CommandButtons>
         {(!isLoggedIn)
@@ -270,17 +275,17 @@ const LoginLayout = styled.div`
   justify-content: space-between;
 `;
 
-const StatusBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 0.5rem;
+// const StatusBar = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   padding: 0 0.5rem;
 
-  > span {
-    font-size: 14px;
-    line-height: 25px;
-  }
-`;
+//   > span {
+//     font-size: 14px;
+//     line-height: 25px;
+//   }
+// `;
 
 const LoginTabs: React.FC = () => {
   const config = useSelector((state: GlobalState) => state.config);
