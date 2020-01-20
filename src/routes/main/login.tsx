@@ -7,7 +7,7 @@ import Icon from 'react-uwp/Icon';
 import Button from 'react-uwp/Button';
 import styled from 'styled-components';
 import Tabs, { Tab } from 'react-uwp/Tabs';
-import { ipcRenderer, IpcRendererEvent, remote } from 'electron';
+import { ipcRenderer, IpcRendererEvent } from 'electron';
 import ProgressBar from 'react-uwp/ProgressBar';
 import ProgressRing from 'react-uwp/ProgressRing';
 import CheckBox from 'react-uwp/CheckBox';
@@ -15,7 +15,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   setAutoSave, ConfigData, setUserInfo, configReload,
 } from '@common/reducer/config/action';
-import { setStatus, EnumLoginState as LoginState } from '@common/reducer/main/action';
+import { setStatus, EnumLoginState as LoginState } from '@common/reducer/login/action';
 import { GlobalState } from '@common/reducer';
 import { decrypt } from '@common/constant';
 
@@ -78,8 +78,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
   const idRef = useRef<TextBox>(null);
   const pwRef = useRef<PasswordBox>(null);
   const saveRef = useRef<CheckBox>(null);
-  const loginState = useSelector((state: GlobalState) => state.main.status);
-  const loginIndex = useSelector((state: GlobalState) => state.main.clientIndex);
+  const loginState = useSelector((state: GlobalState) => state.login.status);
+  const loginIndex = useSelector((state: GlobalState) => state.login.clientIndex);
   const isEncrypted = useSelector((state: GlobalState) => state.config.encrypted);
   const [pending, setPending] = useState<number>(0);
   const dispatch = useDispatch();
@@ -195,7 +195,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
       {(loginIndex !== index)
         && (
         <WarnTitle>
-          현재
+          현재&nbsp;
           {loginIndex + 1}
           클이 활성화되어 있습니다.
         </WarnTitle>
@@ -312,13 +312,13 @@ const LoginTabs: React.FC = () => {
         // width: '100%',
         }}
       >
-        <Tab title="1클">
+        <Tab title="1번 계정">
           <LoginForm index={0} config={config && config.clients[0]} />
         </Tab>
-        <Tab title="2클">
+        <Tab title="2번 계정">
           <LoginForm index={1} config={config && config.clients[1]} />
         </Tab>
-        <Tab title="3클">
+        <Tab title="3번 계정">
           <LoginForm index={2} config={config && config.clients[2]} />
         </Tab>
       </Tabs>

@@ -8,6 +8,7 @@
     "fs-jetpack": "^2.2.3",
     "getmac": "^5.0.0",
     "react": "^16.12.0",
+    "react-countdown": "^2.2.0",
     "react-dom": "^16.12.0",
     "react-helmet": "^5.2.1",
     "react-redux": "^7.1.3",

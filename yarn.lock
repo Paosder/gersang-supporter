@@ -7455,6 +7455,11 @@ lodash.assign@^4.2.0:
   resolved "https://npm.waste-time.today/lodash.assign/-/lodash.assign-4.2.0.tgz#0d99f3ccd7a6d261d19bdaeb9245005d285808e7"
   integrity sha1-DZnzzNem0mHRm9rrkkUAXShYCOc=
 
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://npm.waste-time.today/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
+
 lodash.memoize@^4.1.2:
   version "4.1.2"
   resolved "https://npm.waste-time.today/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
@@ -9806,6 +9811,14 @@ react-app-polyfill@^1.0.5:
     raf "^3.4.1"
     regenerator-runtime "^0.13.3"
     whatwg-fetch "^3.0.0"
+
+react-countdown@^2.2.0:
+  version "2.2.0"
+  resolved "https://npm.waste-time.today/react-countdown/-/react-countdown-2.2.0.tgz#87a8e72794a6f368dca4ca496ac1ce21cf3d19df"
+  integrity sha512-90CyqROLBgy4RKDaZdTdVPjRhTGT6DAWPAYAD0gKp+nO7QXl5+hrBSTfVTs4KyR6oRHgWkQ9VmMcFbAT4prBKQ==
+  dependencies:
+    lodash.isequal "^4.5.0"
+    prop-types "^15.7.2"
 
 react-dev-utils@^10.0.0:
   version "10.0.0"

@@ -16,6 +16,9 @@ const isPrimaryInstance = app.requestSingleInstanceLock();
 if (!isPrimaryInstance) process.exit(0);
 
 // ///////////////////////////////////////////////////////
+// Check update ------------------------------------------
+
+// ///////////////////////////////////////////////////////
 // Load user32 ---------------------
 
 // load only essential apis defined in lib/{dll}/api from user32.dll
@@ -154,6 +157,16 @@ const createWindow = () => {
       },
     },
     {
+      type: 'separator',
+    },
+    {
+      label: '환경 설정',
+      type: 'normal',
+      click: () => {
+        openConfigurationWindow();
+      },
+    },
+    {
       label: '종료',
       type: 'normal',
       click: () => {
@@ -222,21 +235,9 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
 // ///////////////////////////////////////////////////////
 // IPC Communications ----------------------------------
 
-// deprecated.
-// const removeAlert = async () => {
-//   const document = IE.Document;
-//   document.parentWindow.execScript('window.alert = function(str){ console.log(str);};');
-//   document.parentWindow.execScript('window.showModalDialog = function(str){console.log(str);};');
-//   const iframe = document.querySelector('[name=ifrm]');
-//   // iframe.contentWindow.alert = 'function (str) {console.log(str)}';
-//   if (iframe) {
-//     iframe.setAttribute('sandbox', '');
-//   }
-// };
-
-// mainWindow.setProgressBar(0.75);
 ipcMain.on('request-login', async (event, arg) => {
   closeIE();
+  mainWindow.setProgressBar(0.1);
   IE = new ActiveXObject('InternetExplorer.Application');
   // IE.Visible = true;
   IE.silent = true;
@@ -244,6 +245,9 @@ ipcMain.on('request-login', async (event, arg) => {
   await waitBusy();
   logoutUser();
   await waitBusy();
+  IE.navigate('http://www.gersang.co.kr/pub/logi/login/login.gs?returnUrl=www.gersang.co.kr%2Fmain.gs');
+  await waitBusy();
+  mainWindow.setProgressBar(0.2);
   // remoteAlert();
 
   const document = IE.Document;
@@ -252,6 +256,7 @@ ipcMain.on('request-login', async (event, arg) => {
   try {
     t.innerText = arg.id;
     p.innerText = arg.password;
+    mainWindow.setProgressBar(0.5);
   } catch (e) {
     dialog.showErrorBox('로그인 오류!',
       `로그인 중 알 수 없는 문제가 발생했습니다.
@@ -261,6 +266,7 @@ ipcMain.on('request-login', async (event, arg) => {
       error: true,
       reason: 'login-failed',
     });
+    mainWindow.setProgressBar(0);
     return;
   }
 
@@ -276,6 +282,7 @@ ipcMain.on('request-login', async (event, arg) => {
       reason: 'login-failed',
     });
     dialog.showErrorBox('계정 오류!', '아이디 혹은 비밀번호가 틀린가봐요 T.T');
+    mainWindow.setProgressBar(0);
     return;
   }
 
@@ -303,6 +310,7 @@ ipcMain.on('request-login', async (event, arg) => {
     otpWindow.setMenu(null);
     const otpUrl = `${baseUrl}#/otp`;
     otpWindow.loadURL(otpUrl);
+    mainWindow.setProgressBar(0.75);
   } else {
     IE.navigate('http://www.gersang.co.kr/main.gs');
     await waitBusy();
@@ -312,6 +320,7 @@ ipcMain.on('request-login', async (event, arg) => {
         status: true,
         reason: 'success-without-otp',
       });
+      mainWindow.setProgressBar(0);
     } else {
       mainWindow.webContents.send('request-logout', {
         error: true,
@@ -336,6 +345,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
       reason: 'wrong-number-otp',
     });
     dialog.showErrorBox('OTP 오류!', '인증 번호가 맞지 않습니다!');
+    mainWindow.setProgressBar(0);
     return;
   }
   IE.navigate('https://www.gersang.co.kr/main.gs');
@@ -347,10 +357,12 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
       status: true,
       reason: 'success-with-otp',
     });
+    mainWindow.setProgressBar(0);
   }
 });
 
 ipcMain.on('request-logout', (event, forced?: boolean) => {
+  mainWindow.setProgressBar(0);
   if (forced) {
     mainWindow.webContents.send('request-logout', {
       error: true,
@@ -413,7 +425,7 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
   });
 });
 
-ipcMain.on('configuration', (event, arg) => {
+const openConfigurationWindow = () => {
   configWindow = new BrowserWindow({
     width: 400,
     height: 400,
@@ -430,6 +442,10 @@ ipcMain.on('configuration', (event, arg) => {
   configWindow.setMenu(null);
   const configUrl = `${baseUrl}#/configuration`;
   configWindow.loadURL(configUrl);
+};
+
+ipcMain.on('configuration', (event, arg) => {
+  openConfigurationWindow();
 });
 
 ipcMain.on('change-config', (event, silent: boolean) => {
