@@ -8,6 +8,7 @@ import AppBarButton from 'react-uwp/AppBarButton';
 import { NotificationIcon } from '@common/icons';
 import { useSelector } from 'react-redux';
 import { GlobalState } from '@common/reducer';
+import { TimeEditor } from '@common/component';
 
 const ClockLayout = styled.div`
   background-color: white;
@@ -54,7 +55,8 @@ const Timer: React.FC = () => {
   return (
     <TimerLayout>
       <TimerRenderer>
-        <Countdown date={leftTime} onComplete={notifyUser} ref={countDownRef} />
+        {/* <Countdown date={leftTime} onComplete={notifyUser} ref={countDownRef} /> */}
+        <TimeEditor />
       </TimerRenderer>
       <CheckBox
         label="시간이 지나면 알리기"
