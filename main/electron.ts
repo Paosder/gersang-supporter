@@ -77,7 +77,7 @@ let configWindow: Electron.BrowserWindow;
 
 let IE: any;
 
-const waitBusy = (limit: number = 5000) => new Promise((resolve, reject) => {
+const waitBusy = (limit: number = 10000) => new Promise((resolve, reject) => {
   let elapsed = 0;
   const p = () => {
     const title = '웹 페이지 메시지\0'; // null-terminated string
@@ -239,7 +239,7 @@ ipcMain.on('request-login', async (event, arg) => {
   closeIE();
   mainWindow.setProgressBar(0.1);
   IE = new ActiveXObject('InternetExplorer.Application');
-  // IE.Visible = true;
+  IE.Visible = false;
   IE.silent = true;
   IE.navigate('http://www.gersang.co.kr/main.gs');
   await waitBusy();
@@ -358,6 +358,14 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
       reason: 'success-with-otp',
     });
     mainWindow.setProgressBar(0);
+  } else {
+    dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
+    개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
+    denjaraos@gmail.com`);
+    mainWindow.webContents.send('request-logout', {
+      status: false,
+      reason: 'fail-with-otp',
+    });
   }
 });
 
@@ -410,6 +418,7 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
       dialog.showErrorBox('폴더 경로 변경 실패!',
         `폴더 경로 변경에 실패했어요 T.T
         이 프로그램에 접근 권한이 없을 수도 있어요.
+        (혹은 거상을 한번도 켜보지 않았거나 설치되어 있지 않을 수도...?)
         관리자 권한으로 실행시켰음에도 해당 오류가 발생되는 경우 denjaraos@gmail.com 으로 문의주세요.
         `);
     } else {
