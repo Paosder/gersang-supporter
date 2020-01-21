@@ -210,6 +210,10 @@ const createWindow = () => {
 
 
   app.setAppUserModelId('거상 서포터');
+
+  // to prevent reducing performance in background mode (chromium).
+  // https://pracucci.com/electron-slow-background-performances.html
+  app.commandLine.appendSwitch('disable-renderer-backgrounding');
 };
 
 app.on('ready', createWindow);
