@@ -31,11 +31,6 @@ interface TimeUnitProps extends InputProps{
   changeValue: () => void;
 }
 
-// const splitNumberToTime = (timeStr: string) => {
-//   let time = parseInt(timeStr, 10);
-//   let day = time / (3600 * 24);
-// }
-
 const timeToStr = (time: number) => (time < 10 ? `0${time}` : time.toString());
 
 const reCalculateTime = (value: number, limit: number) => {
@@ -49,8 +44,8 @@ const reCalculateTime = (value: number, limit: number) => {
 
 const TimeUnit = React.forwardRef<HTMLInputElement, TimeUnitProps>(({
   displayType = 'minute',
-  defaultValue,
   changeValue,
+  value,
 }, ref) => {
   let limit = 60;
   if (displayType === 'day') {
@@ -66,61 +61,66 @@ const TimeUnit = React.forwardRef<HTMLInputElement, TimeUnitProps>(({
 
   const onWheel = useCallback((e: React.WheelEvent<HTMLInputElement>) => {
     const num = parseInt(e.currentTarget.value, 10);
-    // if (e.deltaY > 0) { // to lower
-    //   num -= 0;
-    // } else {
-    //   num += 0;
-    // }
     e.currentTarget.value = (reCalculateTime(num, limit)).toString();
-  }, [limit]);
+    changeValue();
+  }, [changeValue, limit]);
 
   return (
     <TimeEdit
       ref={ref}
       onChange={valueChange}
-      defaultValue={defaultValue}
+      defaultValue="00"
       type="number"
       min="-1"
       max="60"
       onWheel={onWheel}
+      value={value}
     />
   );
 });
 
 interface TimeEditorProps {
   onChange?: (time: number) => void;
-  initValue?: number;
+  value?: number;
   type?: 'day' | 'hour';
 }
 
-const TimeEditor: React.FC<TimeEditorProps> = ({ onChange, initValue = 0, type = 'day' }) => {
-  let defaultValues = ['00', '00', '00', '00'];
+const TimeEditor: React.FC<TimeEditorProps> = ({ onChange, value = 0, type = 'day' }) => {
+  const [values, setValues] = useState<Array<string>>(['']);
   const unitRef1 = useRef<HTMLInputElement>(null);
   const unitRef2 = useRef<HTMLInputElement>(null);
   const unitRef3 = useRef<HTMLInputElement>(null);
   const unitRef4 = useRef<HTMLInputElement>(null);
 
-  if (initValue && initValue >= 0) {
-    const date = new Date(initValue);
-    // alert(timeToStr(date.getUTCSeconds()));
-    defaultValues = [timeToStr(date.getUTCDate() - 1),
-      timeToStr(date.getUTCHours()),
-      timeToStr(date.getUTCMinutes()),
-      timeToStr(date.getUTCSeconds()),
-    ];
-  }
+  useEffect(() => {
+    if (value >= 0) {
+      const date = new Date(value);
+      setValues([timeToStr(date.getUTCDate() - 1),
+        timeToStr(date.getUTCHours()),
+        timeToStr(date.getUTCMinutes()),
+        timeToStr(date.getUTCSeconds()),
+      ]);
+    } else if (value < 0) {
+      setValues(['00', '00', '00', '00']);
+    }
+  }, [value]);
 
   const timeChange = useCallback(() => {
     if (unitRef1.current
       && unitRef2.current
       && unitRef3.current
-      && unitRef4.current
-      && onChange) {
+      && unitRef4.current) {
+      setValues([unitRef1.current.value,
+        unitRef2.current.value,
+        unitRef3.current.value,
+        unitRef4.current.value]);
       const day = parseInt(unitRef1.current.value, 10) * 3600 * 24;
       const hour = parseInt(unitRef2.current.value, 10) * 3600;
       const minute = parseInt(unitRef3.current.value, 10) * 60;
       const second = parseInt(unitRef4.current.value, 10);
-      onChange((day + hour + minute + second) * 1000);
+      if (onChange) {
+        onChange((day + hour + minute + second) * 1000);
+      }
     }
   }, [onChange, unitRef1, unitRef2, unitRef3, unitRef4]);
 
@@ -128,27 +128,27 @@ const TimeEditor: React.FC<TimeEditorProps> = ({ onChange, initValue = 0, type =
     <div>
       <TimeUnit
         displayType="day"
-        defaultValue={defaultValues[0]}
         changeValue={timeChange}
+        value={values[0]}
         ref={unitRef1}
       />
       :
       <TimeUnit
         displayType="hour"
-        defaultValue={defaultValues[1]}
         ref={unitRef2}
+        value={values[1]}
         changeValue={timeChange}
       />
       :
       <TimeUnit
-        defaultValue={defaultValues[2]}
         ref={unitRef3}
+        value={values[2]}
         changeValue={timeChange}
       />
       :
       <TimeUnit
-        defaultValue={defaultValues[3]}
         ref={unitRef4}
+        value={values[3]}
         changeValue={timeChange}
       />
     </div>

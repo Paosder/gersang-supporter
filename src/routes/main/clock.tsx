@@ -45,6 +45,16 @@ const Timer: React.FC = () => {
   const countDownRef = useRef<Countdown>(null);
   const leftTime = useSelector((state: GlobalState) => state.clock.targetTime);
 
+  const [testTime, setTestTime] = useState(10000);
+  useEffect(() => {
+    if (testTime < 0) {
+      notifyUser();
+    } else {
+      setTimeout(() => {
+        setTestTime(testTime - 1000);
+      }, 1000);
+    }
+  }, [testTime]);
   // useEffect(() => {
   //   if (countDownRef) {
   //     if (countDownRef.current?.api?.isCompleted()) {
@@ -56,7 +66,8 @@ const Timer: React.FC = () => {
     <TimerLayout>
       <TimerRenderer>
         {/* <Countdown date={leftTime} onComplete={notifyUser} ref={countDownRef} /> */}
-        <TimeEditor />
+        <TimeEditor value={testTime} />
+        {testTime}
       </TimerRenderer>
       <CheckBox
         label="시간이 지나면 알리기"
