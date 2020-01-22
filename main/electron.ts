@@ -191,7 +191,7 @@ const createWindow = () => {
     height: 290,
     webPreferences: {
       nodeIntegration: true,
-      devTools: true,
+      devTools: process.env.NODE_ENV === 'development' || false,
       backgroundThrottling: false,
     },
     maximizable: false,
@@ -215,6 +215,13 @@ const createWindow = () => {
 
 
   app.setAppUserModelId('거상 서포터');
+
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools({
+      mode: 'detach',
+      activate: true,
+    });
+  }
 };
 
 app.on('ready', createWindow);

@@ -1,13 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { remote } from 'electron';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import CheckBox from 'react-uwp/CheckBox';
 import Tabs, { Tab } from 'react-uwp/Tabs';
-import Countdown from 'react-countdown';
 import AppBarButton from 'react-uwp/AppBarButton';
-import { NotificationIcon } from '@common/icons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { GlobalState } from '@common/reducer';
+import { setLeftTime, startTimer, setStatus } from '@common/reducer/clock/action';
 import { TimeEditor } from '@common/component';
 
 const ClockLayout = styled.div`
@@ -34,48 +32,61 @@ const TimerControls = styled.div`
   justify-content: space-around;
 `;
 
-const notifyUser = () => {
-  const notification = new Notification('Gersang Supporter', {
-    icon: NotificationIcon,
-    body: '시간이 경과되었어요 !',
-  });
-};
+// const Spinner = styled.div`
+//   display: inline-block;
+//   position: relative;
+//   width: 80px;
+//   height: 80px;
+
+//   div {
+//     position: absolute;
+//     border: 4px solid #000;
+//     opacity: 1;
+//     border-radius: 50%;
+//     animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+
+//     &:nth-child(2) {
+//       animation-delay: -0.5s;
+//     }
+//   }
+
+//   @keyframes lds-ripple {
+//     0% {
+//       top: 36px;
+//       left: 36px;
+//       width: 0;
+//       height: 0;
+//       opacity: 1;
+//     }
+//     100% {
+//       top: 0px;
+//       left: 0px;
+//       width: 72px;
+//       height: 72px;
+//       opacity: 0;
+//     }
+// }
+// `;
 
 const Timer: React.FC = () => {
-  const countDownRef = useRef<Countdown>(null);
-  const leftTime = useSelector((state: GlobalState) => state.clock.targetTime);
+  const dispatch = useDispatch();
+  const leftTime = useSelector((state: GlobalState) => state.clock.leftTime);
 
-  const [testTime, setTestTime] = useState(10000);
-  useEffect(() => {
-    if (testTime < 0) {
-      notifyUser();
-    } else {
-      setTimeout(() => {
-        setTestTime(testTime - 1000);
-      }, 1000);
-    }
-  }, [testTime]);
-  // useEffect(() => {
-  //   if (countDownRef) {
-  //     if (countDownRef.current?.api?.isCompleted()) {
-  //       notifyUser();
-  //     }
-  //   }
-  // }, [countDownRef]);
   return (
     <TimerLayout>
       <TimerRenderer>
-        {/* <Countdown date={leftTime} onComplete={notifyUser} ref={countDownRef} /> */}
-        <TimeEditor value={testTime} />
-        {testTime}
+        <TimeEditor value={leftTime} onChange={(time) => dispatch(setLeftTime(time))} />
       </TimerRenderer>
+
       <CheckBox
         label="시간이 지나면 알리기"
-        defaultChecked={false}
+        defaultChecked
+        disabled
         style={{
           userSelect: 'none',
         }}
       />
+
       <TimerControls>
         <AppBarButton
           icon="PlayLegacy"
@@ -85,6 +96,7 @@ const Timer: React.FC = () => {
             height: '40px',
           }}
           hoverStyle={{ background: 'yellowgreen' }}
+          onClick={() => dispatch(startTimer())}
         />
         <AppBarButton
           icon="PauseLegacy"
@@ -94,6 +106,7 @@ const Timer: React.FC = () => {
             height: '40px',
           }}
           hoverStyle={{ background: 'yellowgreen' }}
+          onClick={() => dispatch(setStatus('PAUSE'))}
         />
         <AppBarButton
           icon="StopLegacy"
@@ -103,9 +116,17 @@ const Timer: React.FC = () => {
             height: '40px',
           }}
           hoverStyle={{ background: 'yellowgreen' }}
+          onClick={() => dispatch(setStatus('STOP'))}
         />
       </TimerControls>
     </TimerLayout>
+  );
+};
+
+const StopWatch: React.FC = () => {
+  const t = 4;
+  return (
+    <div>STOPWATCH AREA</div>
   );
 };
 
@@ -122,8 +143,7 @@ const Clock: React.FC = () => {
           <Timer />
         </Tab>
         <Tab title="스톱워치">
-          <Timer />
-
+          <StopWatch />
         </Tab>
       </Tabs>
     </ClockLayout>

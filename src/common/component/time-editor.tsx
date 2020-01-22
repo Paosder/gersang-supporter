@@ -45,7 +45,7 @@ const reCalculateTime = (value: number, limit: number) => {
 const TimeUnit = React.forwardRef<HTMLInputElement, TimeUnitProps>(({
   displayType = 'minute',
   changeValue,
-  value,
+  value = '00',
 }, ref) => {
   let limit = 60;
   if (displayType === 'day') {
@@ -69,7 +69,6 @@ const TimeUnit = React.forwardRef<HTMLInputElement, TimeUnitProps>(({
     <TimeEdit
       ref={ref}
       onChange={valueChange}
-      defaultValue="00"
       type="number"
       min="-1"
       max="60"
