@@ -31,6 +31,12 @@ const decreaseLeftTime = (time: number) => ({
   time,
 });
 
+export const startStopwatch = (): ThunkAction<Promise<void>, {
+  clock: ClockState
+}, {}, ClockActions> => async (dispatch, getState) => {
+
+};
+
 export const startTimer = (): ThunkAction<Promise<void>, {
   clock: ClockState
 }, {}, ClockActions> => async (dispatch, getState) => {
