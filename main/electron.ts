@@ -65,6 +65,10 @@ const baseUrl = process.env.ELECTRON_START_URL || url.format({
 
 const trayImg = process.env.NODE_ENV === 'development' ? path.join(__dirname, '../public/logo.jpg') : path.join(__dirname, './logo.jpg');
 
+
+// to prevent reducing performance in background mode (chromium).
+// https://pracucci.com/electron-slow-background-performances.html
+// app.commandLine.appendSwitch('disable-renderer-backgrounding');
 // ///////////////////////////////////////////////////////
 // Main ----------------------------------
 
@@ -188,6 +192,7 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       devTools: true,
+      backgroundThrottling: false,
     },
     maximizable: false,
     resizable: false,
@@ -210,10 +215,6 @@ const createWindow = () => {
 
 
   app.setAppUserModelId('거상 서포터');
-
-  // to prevent reducing performance in background mode (chromium).
-  // https://pracucci.com/electron-slow-background-performances.html
-  app.commandLine.appendSwitch('disable-renderer-backgrounding');
 };
 
 app.on('ready', createWindow);
