@@ -371,13 +371,25 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     });
     mainWindow.setProgressBar(0);
   } else {
-    dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
-    개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
-    denjaraos@gmail.com`);
-    mainWindow.webContents.send('request-logout', {
-      status: false,
-      reason: 'fail-with-otp',
-    });
+    // unknown failed. try again...
+    IE.navigate('https://www.gersang.co.kr/main.gs');
+    await waitBusy();
+    const logoutAgain = document.querySelector('[src="/image/main/txt_logout.gif"]');
+    if (logoutAgain) {
+      mainWindow.webContents.send('request-login', {
+        status: true,
+        reason: 'success-with-otp',
+      });
+      mainWindow.setProgressBar(0);
+    } else {
+      dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
+      개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
+      denjaraos@gmail.com`);
+      mainWindow.webContents.send('request-logout', {
+        status: false,
+        reason: 'fail-with-otp',
+      });
+    }
   }
 });
 
