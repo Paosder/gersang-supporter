@@ -65,7 +65,24 @@ const baseUrl = process.env.ELECTRON_START_URL || url.format({
 
 const trayImg = process.env.NODE_ENV === 'development' ? path.join(__dirname, '../public/logo.jpg') : path.join(__dirname, './logo.jpg');
 
-
+const openConfigurationWindow = () => {
+  configWindow = new BrowserWindow({
+    width: 400,
+    height: 400,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    parent: mainWindow,
+    modal: true,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+    icon: trayImg,
+  });
+  configWindow.setMenu(null);
+  const configUrl = `${baseUrl}#/configuration`;
+  configWindow.loadURL(configUrl);
+};
 // to prevent reducing performance in background mode (chromium).
 // https://pracucci.com/electron-slow-background-performances.html
 // app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -451,24 +468,6 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
   });
 });
 
-const openConfigurationWindow = () => {
-  configWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-    parent: mainWindow,
-    modal: true,
-    minimizable: false,
-    maximizable: false,
-    resizable: false,
-    icon: trayImg,
-  });
-  configWindow.setMenu(null);
-  const configUrl = `${baseUrl}#/configuration`;
-  configWindow.loadURL(configUrl);
-};
 
 ipcMain.on('configuration', (event, arg) => {
   openConfigurationWindow();

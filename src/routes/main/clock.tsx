@@ -23,50 +23,14 @@ const TimerLayout = styled.div`
 
 const TimerRenderer = styled.div`
   font-size: 4rem;
-  margin-bottom: 2rem;
 `;
 
 const TimerControls = styled.div`
+  margin-top: 2rem;
   padding-top: 1rem;
   display: flex;
   justify-content: space-around;
 `;
-
-// const Spinner = styled.div`
-//   display: inline-block;
-//   position: relative;
-//   width: 80px;
-//   height: 80px;
-
-//   div {
-//     position: absolute;
-//     border: 4px solid #000;
-//     opacity: 1;
-//     border-radius: 50%;
-//     animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
-
-//     &:nth-child(2) {
-//       animation-delay: -0.5s;
-//     }
-//   }
-
-//   @keyframes lds-ripple {
-//     0% {
-//       top: 36px;
-//       left: 36px;
-//       width: 0;
-//       height: 0;
-//       opacity: 1;
-//     }
-//     100% {
-//       top: 0px;
-//       left: 0px;
-//       width: 72px;
-//       height: 72px;
-//       opacity: 0;
-//     }
-// }
-// `;
 
 const Timer: React.FC = () => {
   const dispatch = useDispatch();
@@ -123,10 +87,90 @@ const Timer: React.FC = () => {
   );
 };
 
+interface SpinnerProps {
+  active?: boolean;
+}
+
+const Spinner = styled.div<SpinnerProps>`
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+
+  div {
+    position: absolute;
+    border: 4px solid #000;
+    border-radius: 50%;
+    ${(props) => (props.active ? `
+      opacity: 1;
+      animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    ` : 'opacity: 0;')}
+    
+    &:nth-child(2) {
+      animation-delay: -0.5s;
+    }
+  }
+
+  @keyframes lds-ripple {
+    0% {
+      top: 36px;
+      left: 36px;
+      width: 0;
+      height: 0;
+      opacity: 1;
+    }
+    100% {
+      top: 0px;
+      left: 0px;
+      width: 72px;
+      height: 72px;
+      opacity: 0;
+    }
+}
+`;
+
+
 const StopWatch: React.FC = () => {
   const t = 4;
   return (
-    <div>STOPWATCH AREA</div>
+    <TimerLayout>
+      <TimerRenderer>
+        <TimeEditor value={0} />
+      </TimerRenderer>
+      <Spinner active>
+        <div />
+        <div />
+      </Spinner>
+      <TimerControls>
+        <AppBarButton
+          icon="PlayLegacy"
+          label="시작"
+          labelPosition="right"
+          style={{
+            height: '40px',
+          }}
+          hoverStyle={{ background: 'yellowgreen' }}
+        />
+        <AppBarButton
+          icon="PauseLegacy"
+          label="일시 정지"
+          labelPosition="right"
+          style={{
+            height: '40px',
+          }}
+          hoverStyle={{ background: 'yellowgreen' }}
+        />
+        <AppBarButton
+          icon="StopLegacy"
+          label="정지"
+          labelPosition="right"
+          style={{
+            height: '40px',
+          }}
+          hoverStyle={{ background: 'yellowgreen' }}
+        />
+      </TimerControls>
+    </TimerLayout>
   );
 };
 
