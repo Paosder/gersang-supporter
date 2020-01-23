@@ -57,6 +57,11 @@ const Directory = styled.div`
   align-items: center;
 `;
 
+const ProgramInfo = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
+`;
+
 interface DirectoryInfo {
   index: number;
   path: string;
@@ -204,6 +209,9 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
             <IconButton onClick={() => { getNewDirectory(2); }}>FileExplorerApp</IconButton>
           </ToolTip>
         </Directory>
+        <ProgramInfo>
+          프로그램 정보...
+        </ProgramInfo>
       </OptionLayout>
     </ConfigLayout>
   );

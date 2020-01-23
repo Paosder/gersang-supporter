@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import { app } from 'electron';
 import * as fsj from 'fs-jetpack';
 
+// https://gist.github.com/coclav/4fd17efc9efa2c0517b2
+
 // example usage :
 // copyFileOutsideOfElectronAsar( "myFolderInsideTheAsarFile", app.getPath("temp") + "com.bla.bla"
 

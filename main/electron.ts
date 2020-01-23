@@ -222,6 +222,9 @@ const createWindow = () => {
       activate: true,
     });
   }
+
+  // close background IE when app close
+  mainWindow.on('close', closeIE);
 };
 
 app.on('ready', createWindow);
@@ -360,37 +363,27 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     mainWindow.setProgressBar(0);
     return;
   }
-  IE.navigate('https://www.gersang.co.kr/main.gs');
-  await waitBusy();
-  const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
-
-  if (logout) {
-    mainWindow.webContents.send('request-login', {
-      status: true,
-      reason: 'success-with-otp',
-    });
-    mainWindow.setProgressBar(0);
-  } else {
-    // unknown failed. try again...
+  for (let i = 0; i < 2; i += 1) {
+    // cross check twice (occationally fails at first time)
     IE.navigate('https://www.gersang.co.kr/main.gs');
-    await waitBusy();
-    const logoutAgain = document.querySelector('[src="/image/main/txt_logout.gif"]');
-    if (logoutAgain) {
+    await waitBusy(); // eslint-disable-line
+    const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
+    if (logout) {
       mainWindow.webContents.send('request-login', {
         status: true,
         reason: 'success-with-otp',
       });
       mainWindow.setProgressBar(0);
-    } else {
-      dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
-      개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
-      denjaraos@gmail.com`);
-      mainWindow.webContents.send('request-logout', {
-        status: false,
-        reason: 'fail-with-otp',
-      });
+      return;
     }
   }
+  dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
+  개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
+  denjaraos@gmail.com`);
+  mainWindow.webContents.send('request-logout', {
+    status: false,
+    reason: 'fail-with-otp',
+  });
 });
 
 ipcMain.on('request-logout', (event, forced?: boolean) => {
