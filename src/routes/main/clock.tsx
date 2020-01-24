@@ -18,7 +18,7 @@ const TimerLayout = styled.div`
   flex-direction: column;
   /* justify-content: center; */
   align-items: center;
-  height: 200px;
+  height: 225px;
 `;
 
 const TimerRenderer = styled.div`
@@ -26,10 +26,15 @@ const TimerRenderer = styled.div`
 `;
 
 const TimerControls = styled.div`
-  margin-top: 2rem;
-  padding-top: 1rem;
+  /* margin-top: 2rem; */
   display: flex;
   justify-content: space-around;
+`;
+
+const CheckboxControls = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 80px;
 `;
 
 const Timer: React.FC = () => {
@@ -42,14 +47,26 @@ const Timer: React.FC = () => {
         <TimeEditor value={leftTime} onChange={(time) => dispatch(setLeftTime(time))} />
       </TimerRenderer>
 
-      <CheckBox
-        label="시간이 지나면 알리기"
-        defaultChecked
-        disabled
-        style={{
-          userSelect: 'none',
-        }}
-      />
+      <CheckboxControls>
+        <CheckBox
+          label="시간이 지나면 알리기"
+          defaultChecked
+          disabled
+          style={{
+            userSelect: 'none',
+            marginBottom: '0.5rem',
+          }}
+        />
+        <CheckBox
+          label="알람음 울리기"
+          defaultChecked={false}
+          disabled
+          style={{
+            userSelect: 'none',
+          }}
+        />
+
+      </CheckboxControls>
 
       <TimerControls>
         <AppBarButton
