@@ -28,7 +28,13 @@ const user32 = U.load(['FindWindowExW', 'SendMessageW']);
 // Registry related prerequisites ------------------------
 
 if (process.env.NODE_ENV !== 'development') {
-  copy(path.join('node_modules/regedit/vbs'), path.join(path.dirname(app.getPath('exe')), './registry'));
+  try {
+    copy(path.join('node_modules/regedit/vbs'), path.join(path.dirname(app.getPath('exe')), './registry'));
+  } catch {
+    dialog.showErrorBox('초기화 오류!', `파일 쓰기 오류입니다 T.T
+    파일 쓰기 권한이 필요 없는 곳에 설치하시거나 관리자 권한으로 실행시켜주세요!`);
+    process.exit(1);
+  }
   const vbsDirectory = path.join(path.dirname(app.getPath('exe')), './registry');
   regedit.setExternalVBSLocation(vbsDirectory);
 }

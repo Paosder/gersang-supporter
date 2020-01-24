@@ -2,16 +2,16 @@
   "encrypted": "true",
   "clients": [
     {
-      "username": "",
-      "password": "",
-      "path": "C:\\AKInteractive\\Gersang",
-      "alwaysSave": "false"
+      "username": "414fa0652793813f8558318239d1119a:c194ef1f409baf774620b13191ea0ea3",
+      "password": "3a3111942a5ed3f5d8f12e8f55972923:d3f12e97ff8464dd8e3a45d3ea304902",
+      "path": "C:\\AKInteractive\\Gersang-client1",
+      "alwaysSave": "true"
     },
     {
-      "username": "",
-      "password": "",
+      "username": "54c8bd34cd6cdc28ae7f36cb53677532:308aaee800aaf994ba5be70324a34bd8",
+      "password": "08fd06126f044bea7500ae64a318f9c7:5ad4635e88f3e6d8e23756e89eeb996e",
       "path": "C:\\AKInteractive\\Gersang-client2",
-      "alwaysSave": "false"
+      "alwaysSave": "true"
     },
     {
       "username": "",

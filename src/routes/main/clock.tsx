@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import CheckBox from 'react-uwp/CheckBox';
 import Tabs, { Tab } from 'react-uwp/Tabs';
@@ -16,7 +16,6 @@ const TimerLayout = styled.div`
   width: calc(100vw - 48px);
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   align-items: center;
   height: 225px;
 `;
@@ -26,7 +25,6 @@ const TimerRenderer = styled.div`
 `;
 
 const TimerControls = styled.div`
-  /* margin-top: 2rem; */
   display: flex;
   justify-content: space-around;
 `;
@@ -191,24 +189,21 @@ const StopWatch: React.FC = () => {
   );
 };
 
-const Clock: React.FC = () => {
-  const t = 4;
-  return (
-    <ClockLayout>
-      <Tabs
-        tabTitleStyle={{
-          userSelect: 'none',
-        }}
-      >
-        <Tab title="타이머">
-          <Timer />
-        </Tab>
-        <Tab title="스톱워치">
-          <StopWatch />
-        </Tab>
-      </Tabs>
-    </ClockLayout>
-  );
-};
+const Clock: React.FC = () => (
+  <ClockLayout>
+    <Tabs
+      tabTitleStyle={{
+        userSelect: 'none',
+      }}
+    >
+      <Tab title="타이머">
+        <Timer />
+      </Tab>
+      <Tab title="스톱워치">
+        <StopWatch />
+      </Tab>
+    </Tabs>
+  </ClockLayout>
+);
 
 export default Clock;
