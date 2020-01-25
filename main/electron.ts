@@ -102,6 +102,8 @@ let mainWindow: Electron.BrowserWindow;
 
 let configWindow: Electron.BrowserWindow;
 
+let otpWindow: Electron.BrowserWindow;
+
 let IE: any;
 
 const waitBusy = (limit: number = 10000) => new Promise((resolve, reject) => {
@@ -332,7 +334,7 @@ ipcMain.on('request-login', async (event, arg) => {
       status: false,
       reason: 'otp-required',
     });
-    const otpWindow = new BrowserWindow({
+    otpWindow = new BrowserWindow({
       width: 160,
       height: 90,
       webPreferences: {
