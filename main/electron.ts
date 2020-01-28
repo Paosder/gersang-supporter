@@ -7,6 +7,7 @@ import * as url from 'url';
 import fs from 'fs';
 import * as regedit from 'regedit';
 import { U } from 'win32-api';
+import dns from 'dns';
 import copy from './copy-content';
 
 // ///////////////////////////////////////////////////////
@@ -16,7 +17,14 @@ const isPrimaryInstance = app.requestSingleInstanceLock();
 if (!isPrimaryInstance) process.exit(0);
 
 // ///////////////////////////////////////////////////////
-// Check update ------------------------------------------
+// Check internet status ---------------------------------
+
+dns.promises.lookup('google.com').catch(() => {
+  dialog.showErrorBox('인터넷 연결 오류!',
+    '인터넷이 연결되어있지 않은 것 같아요! 확인해주세요 T.T');
+  closeIE();
+  process.exit(0);
+});
 
 // ///////////////////////////////////////////////////////
 // Load user32 ---------------------
@@ -39,11 +47,6 @@ if (process.env.NODE_ENV !== 'development') {
   regedit.setExternalVBSLocation(vbsDirectory);
 }
 
-
-// regedit.list('HKCU\\SOFTWARE\\JOYON\\Gersang\\Korean', (err, result) => {
-//   console.log(result);
-// });
-
 // ///////////////////////////////////////////////////////
 // Common config file check ------------------------------
 if (process.env.NODE_ENV !== 'development') {
@@ -51,13 +54,9 @@ if (process.env.NODE_ENV !== 'development') {
     fs.statSync(path.join(path.dirname(app.getPath('exe')),
       './config.json'));
   } catch {
-    fs.copyFileSync(path.join('build/config.json'), path.join(path.dirname(app.getPath('exe')), './config.json'));
+    copy(path.join('build/config.json'), path.join(path.dirname(app.getPath('exe')), './config.json'));
   }
 } else {
-  console.log(
-    fs.statSync(path.join(__dirname, '../public/config.json')),
-  );
-  console.log(path.join(__dirname, '../main/config.json'));
   fs.copyFileSync(path.join(__dirname, '../public/config.json'), path.join(__dirname, '../main/config.json'));
 }
 
@@ -95,9 +94,6 @@ const openConfigurationWindow = () => {
   const configUrl = `${baseUrl}#/configuration`;
   configWindow.loadURL(configUrl);
 };
-// to prevent reducing performance in background mode (chromium).
-// https://pracucci.com/electron-slow-background-performances.html
-// app.commandLine.appendSwitch('disable-renderer-backgrounding');
 // ///////////////////////////////////////////////////////
 // Main ----------------------------------
 
@@ -223,6 +219,7 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       devTools: process.env.NODE_ENV === 'development' || false,
+      // to prevent reducing performance in background mode (chromium).
       backgroundThrottling: false,
     },
     maximizable: false,
@@ -287,14 +284,18 @@ ipcMain.on('request-login', async (event, arg) => {
   IE = new ActiveXObject('InternetExplorer.Application');
   IE.Visible = false;
   IE.silent = true;
-  IE.navigate('http://www.gersang.co.kr/main.gs');
-  await waitBusy();
-  logoutUser();
-  await waitBusy();
-  IE.navigate('http://www.gersang.co.kr/pub/logi/login/login.gs?returnUrl=www.gersang.co.kr%2Fmain.gs');
-  await waitBusy();
+  try {
+    IE.navigate('http://www.gersang.co.kr/main.gs');
+    await waitBusy();
+    logoutUser();
+    await waitBusy();
+    IE.navigate('http://www.gersang.co.kr/pub/logi/login/login.gs?returnUrl=www.gersang.co.kr%2Fmain.gs');
+    await waitBusy();
+  } catch (e) {
+    dialog.showErrorBox('IE 오류!',
+      '인터넷이 연결되어있지 않을 수도 있어요!');
+  }
   mainWindow.setProgressBar(0.2);
-  // remoteAlert();
 
   const document = IE.Document;
   const t = document.querySelector('[name=GSuserID]');
@@ -308,7 +309,7 @@ ipcMain.on('request-login', async (event, arg) => {
       `로그인 중 알 수 없는 문제가 발생했습니다.
 홈페이지가 정상적이지 않을 수도 있습니다.
 해당 증상이 반복될 경우 denjaraos@gmail.com 으로 문의주시면 감사하겠습니다.`);
-    event.reply('request-logout', {
+    event.reply('response-logout', {
       error: true,
       reason: 'login-failed',
     });
@@ -323,7 +324,7 @@ ipcMain.on('request-login', async (event, arg) => {
     await waitBusy();
   } catch {
     IE.Application.Quit();
-    event.reply('request-logout', {
+    event.reply('response-logout', {
       error: true,
       reason: 'login-failed',
     });
@@ -336,7 +337,7 @@ ipcMain.on('request-login', async (event, arg) => {
 
   if (otp) {
     // remoteAlert();
-    event.reply('request-login', {
+    event.reply('response-login', {
       status: false,
       reason: 'otp-required',
     });
@@ -362,13 +363,13 @@ ipcMain.on('request-login', async (event, arg) => {
     await waitBusy();
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
-      event.reply('request-login', {
+      event.reply('response-login', {
         status: true,
         reason: 'success-without-otp',
       });
       mainWindow.setProgressBar(0);
     } else {
-      mainWindow.webContents.send('request-logout', {
+      mainWindow.webContents.send('response-logout', {
         error: true,
         reason: 'login-error',
       });
@@ -386,7 +387,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   try {
     await waitBusy();
   } catch {
-    mainWindow.webContents.send('request-logout', {
+    mainWindow.webContents.send('response-logout', {
       error: true,
       reason: 'wrong-number-otp',
     });
@@ -400,7 +401,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     await waitBusy(); // eslint-disable-line
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
-      mainWindow.webContents.send('request-login', {
+      mainWindow.webContents.send('response-login', {
         status: true,
         reason: 'success-with-otp',
       });
@@ -411,7 +412,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
   개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
   denjaraos@gmail.com`);
-  mainWindow.webContents.send('request-logout', {
+  mainWindow.webContents.send('response-logout', {
     status: false,
     reason: 'fail-with-otp',
   });
@@ -420,13 +421,13 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
 ipcMain.on('request-logout', (event, forced?: boolean) => {
   mainWindow.setProgressBar(0);
   if (forced) {
-    mainWindow.webContents.send('request-logout', {
+    mainWindow.webContents.send('response-logout', {
       error: true,
       reason: 'cancel-otp',
     });
     dialog.showErrorBox('OTP 취소!', 'OTP 인증을 취소하였습니다.');
   } else {
-    mainWindow.webContents.send('request-logout', {
+    mainWindow.webContents.send('response-logout', {
       error: false,
       reason: 'success-logout',
     });

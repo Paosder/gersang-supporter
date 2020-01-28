@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.paths",
   "name": "gersang-supporter",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha",
   "private": true,
   "author": "Paosder",
   "dependencies": {
@@ -50,7 +50,8 @@
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
-      "license": "eula.html"
+      "license": "eula.html",
+      "include": "nsis-installer.nsh"
     },
     "directories": {
       "buildResources": "./public",
@@ -90,7 +91,7 @@
     "cross-env": "^6.0.3",
     "electron": "^7.1.9",
     "electron-builder": "^21.2.0",
-    "electron-rebuild": "^1.8.8",
+    "electron-rebuild": "^1.9.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.20.0",

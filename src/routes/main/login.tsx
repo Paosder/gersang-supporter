@@ -141,7 +141,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
   }, [config, idRef, isEncrypted, pwRef]);
 
   useEffect(() => {
-    const requestLoginCallback = (event: IpcRendererEvent, res: LoginResponse) => {
+    const responseLoginCallback = (event: IpcRendererEvent, res: LoginResponse) => {
       if (res.status) {
         // setLoginState(LoginState.LOGIN);
         if (config.alwaysSave === 'true') {
@@ -158,7 +158,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
       }
     };
 
-    const requestLogoutCallback = (event: IpcRendererEvent, res: LogoutResponse) => {
+    const responseLogoutCallback = (event: IpcRendererEvent, res: LogoutResponse) => {
       if (res.error) {
         // setLoginState(LoginState.LOGOUT);
         setPending(5);
@@ -168,11 +168,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
       }
       dispatch(setStatus(index, LoginState.LOGOUT));
     };
-    ipcRenderer.on('request-login', requestLoginCallback);
-    ipcRenderer.on('request-logout', requestLogoutCallback);
+    ipcRenderer.on('response-login', responseLoginCallback);
+    ipcRenderer.on('response-logout', responseLogoutCallback);
     return () => {
-      ipcRenderer.off('request-login', requestLoginCallback);
-      ipcRenderer.off('request-logout', requestLogoutCallback);
+      ipcRenderer.off('response-login', responseLoginCallback);
+      ipcRenderer.off('response-logout', responseLogoutCallback);
     };
   }, [config.alwaysSave, dispatch, index, idRef, pwRef]);
 
