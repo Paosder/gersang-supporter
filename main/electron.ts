@@ -51,8 +51,14 @@ if (process.env.NODE_ENV !== 'development') {
     fs.statSync(path.join(path.dirname(app.getPath('exe')),
       './config.json'));
   } catch {
-    copy(path.join('build/config.json'), path.join(path.dirname(app.getPath('exe')), './config.json'));
+    fs.copyFileSync(path.join('build/config.json'), path.join(path.dirname(app.getPath('exe')), './config.json'));
   }
+} else {
+  console.log(
+    fs.statSync(path.join(__dirname, '../public/config.json')),
+  );
+  console.log(path.join(__dirname, '../main/config.json'));
+  fs.copyFileSync(path.join(__dirname, '../public/config.json'), path.join(__dirname, '../main/config.json'));
 }
 
 // ///////////////////////////////////////////////////////
