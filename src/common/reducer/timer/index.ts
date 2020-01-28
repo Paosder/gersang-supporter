@@ -1,24 +1,18 @@
 import { Reducer } from 'redux';
 import { NotificationIcon } from '@common/icons';
 import {
-  ClockActions, SET_MODE, SET_LEFT_TIME,
-  DECREASE_LEFT_TIME, SET_STATUS, ClockState,
+  TimerActions, SET_LEFT_TIME,
+  DECREASE_LEFT_TIME, SET_STATUS, TimerState,
 } from './action';
 
-const initState = (): ClockState => ({
-  mode: 'timer',
+const initState = (): TimerState => ({
   leftTime: 0,
   status: 'STOP',
   notification: true,
 });
 
-const reducer = (state = initState(), action: ClockActions) => {
+const reducer = (state = initState(), action: TimerActions) => {
   switch (action.type) {
-    case SET_MODE:
-      return {
-        ...state,
-        mode: action.mode,
-      };
     case SET_STATUS:
       if (action.status === 'STOP') {
         return {

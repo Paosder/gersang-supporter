@@ -5,7 +5,12 @@ import Tabs, { Tab } from 'react-uwp/Tabs';
 import AppBarButton from 'react-uwp/AppBarButton';
 import { useSelector, useDispatch } from 'react-redux';
 import { GlobalState } from '@common/reducer';
-import { setLeftTime, startTimer, setStatus } from '@common/reducer/clock/action';
+import { setLeftTime, startTimer, setStatus } from '@common/reducer/timer/action';
+import {
+  setStatus as setStopwatchStatus,
+  startStopwatch,
+  setBaseTime,
+} from '@common/reducer/stopwatch/action';
 import { TimeEditor } from '@common/component';
 
 const ClockLayout = styled.div`
@@ -37,7 +42,7 @@ const CheckboxControls = styled.div`
 
 const Timer: React.FC = () => {
   const dispatch = useDispatch();
-  const leftTime = useSelector((state: GlobalState) => state.clock.leftTime);
+  const leftTime = useSelector((state: GlobalState) => state.timer.leftTime);
 
   return (
     <TimerLayout>
@@ -113,6 +118,8 @@ const Spinner = styled.div<SpinnerProps>`
   height: 80px;
 
   div {
+    top: 36px;
+    left: 36px;
     position: absolute;
     border: 4px solid #000;
     border-radius: 50%;
@@ -146,13 +153,15 @@ const Spinner = styled.div<SpinnerProps>`
 
 
 const StopWatch: React.FC = () => {
-  const t = 4;
+  const dispatch = useDispatch();
+  const elapsedTime = useSelector((state: GlobalState) => state.stopwatch.elapsedTime);
+  const stopwatchStatus = useSelector((state: GlobalState) => state.stopwatch.status);
   return (
     <TimerLayout>
       <TimerRenderer>
-        <TimeEditor value={0} />
+        <TimeEditor value={elapsedTime} />
       </TimerRenderer>
-      <Spinner active>
+      <Spinner active={stopwatchStatus === 'START'}>
         <div />
         <div />
       </Spinner>
@@ -165,6 +174,10 @@ const StopWatch: React.FC = () => {
             height: '40px',
           }}
           hoverStyle={{ background: 'yellowgreen' }}
+          onClick={() => {
+            dispatch(setBaseTime(Date.now()));
+            dispatch(startStopwatch());
+          }}
         />
         <AppBarButton
           icon="PauseLegacy"
