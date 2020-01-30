@@ -123,6 +123,7 @@ const Spinner = styled.div<SpinnerProps>`
     position: absolute;
     border: 4px solid #000;
     border-radius: 50%;
+    box-sizing: content-box;
     ${(props) => (props.active ? `
       opacity: 1;
       animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
@@ -187,6 +188,9 @@ const StopWatch: React.FC = () => {
             height: '40px',
           }}
           hoverStyle={{ background: 'yellowgreen' }}
+          onClick={() => {
+            dispatch(setStopwatchStatus('PAUSE'));
+          }}
         />
         <AppBarButton
           icon="StopLegacy"
@@ -196,6 +200,9 @@ const StopWatch: React.FC = () => {
             height: '40px',
           }}
           hoverStyle={{ background: 'yellowgreen' }}
+          onClick={() => {
+            dispatch(setStopwatchStatus('STOP'));
+          }}
         />
       </TimerControls>
     </TimerLayout>
