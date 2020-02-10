@@ -13,7 +13,7 @@ import ProgressRing from 'react-uwp/ProgressRing';
 import CheckBox from 'react-uwp/CheckBox';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  setAutoSave, ConfigData, setUserInfo, configReload,
+  setAutoSave, setAutoRestore, setUserInfo, configReload,
 } from '@common/reducer/config/action';
 import { setStatus, EnumLoginState as LoginState } from '@common/reducer/login/action';
 import { GlobalState } from '@common/reducer';
@@ -70,17 +70,18 @@ interface LogoutResponse {
 }
 
 interface LoginFormProps {
-  config: ConfigData;
   index: number;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ index }) => {
   const idRef = useRef<TextBox>(null);
   const pwRef = useRef<PasswordBox>(null);
-  const saveRef = useRef<CheckBox>(null);
   const loginState = useSelector((state: GlobalState) => state.login.status);
   const loginIndex = useSelector((state: GlobalState) => state.login.clientIndex);
   const isEncrypted = useSelector((state: GlobalState) => state.config.encrypted);
+  const config = useSelector((state: GlobalState) => state.config.clients[index]);
+  const restorePath = useSelector((state: GlobalState) => state.config.clients[0].path);
+
   const [pending, setPending] = useState<number>(0);
   const dispatch = useDispatch();
 
@@ -109,7 +110,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
   const requestGameExecute = () => {
     ipcRenderer.send('execute-game', {
       index,
-      path: config!.path,
+      path: config.path,
+      restorePath,
+      restore: config.alwaysRestore === 'true',
     }); // set client number
   };
 
@@ -123,6 +126,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
 
   const toggleSaveConfig = (checked?: boolean) => {
     dispatch(setAutoSave(checked || false, index));
+  };
+
+  const toggleRestoreConfig = (checked?: boolean) => {
+    dispatch(setAutoRestore(checked || false, index));
   };
 
   useEffect(() => {
@@ -222,7 +229,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ config, index }) => {
         label="로그인에 성공할 경우 로그인 정보 저장하기"
         defaultChecked={config.alwaysSave === 'true'}
         onCheck={toggleSaveConfig}
-        ref={saveRef}
+        style={{
+          userSelect: 'none',
+        }}
+      />
+      <CheckBox
+        label="게임 실행전 클라이언트 변조 현상 항상 복구"
+        defaultChecked={config.alwaysRestore === 'true'}
+        disabled={index === 0}
+        onCheck={toggleRestoreConfig}
         style={{
           userSelect: 'none',
         }}
@@ -291,7 +306,6 @@ const LoginLayout = styled.div`
 // `;
 
 const LoginTabs: React.FC = () => {
-  const config = useSelector((state: GlobalState) => state.config);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -313,13 +327,13 @@ const LoginTabs: React.FC = () => {
         }}
       >
         <Tab title="1번 계정">
-          <LoginForm index={0} config={config && config.clients[0]} />
+          <LoginForm index={0} />
         </Tab>
         <Tab title="2번 계정">
-          <LoginForm index={1} config={config && config.clients[1]} />
+          <LoginForm index={1} />
         </Tab>
         <Tab title="3번 계정">
-          <LoginForm index={2} config={config && config.clients[2]} />
+          <LoginForm index={2} />
         </Tab>
       </Tabs>
       {/* <StatusBar>

@@ -7375,6 +7375,16 @@ lines-and-columns@^1.1.6:
   resolved "https://npm.waste-time.today/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
+lnk@^1.1.0:
+  version "1.1.0"
+  resolved "https://npm.waste-time.today/lnk/-/lnk-1.1.0.tgz#acee59b91ca9a0a8fc12a3dbc53b9edc5f353dd7"
+  integrity sha1-rO5ZuRypoKj8EqPbxTue3F81Pdc=
+  dependencies:
+    arrify "^1.0.1"
+    mkdirp "^0.5.0"
+    pify "^2.3"
+    rimraf "^2.5.4"
+
 load-json-file@^2.0.0:
   version "2.0.0"
   resolved "https://npm.waste-time.today/load-json-file/-/load-json-file-2.0.0.tgz#7947e42149af80d696cbf797bcaabcfe1fe29ca8"
@@ -8774,7 +8784,7 @@ picomatch@^2.0.4, picomatch@^2.0.5, picomatch@^2.0.7:
   resolved "https://npm.waste-time.today/picomatch/-/picomatch-2.2.1.tgz#21bac888b6ed8601f831ce7816e335bc779f0a4a"
   integrity sha512-ISBaA8xQNmwELC7eOjqFKMESB2VIqt4PPDD0nsS95b/9dZXvVKOlz9keMSnoGGKcOHXfTvDD6WMaRoSc9UuhRA==
 
-pify@^2.0.0:
+pify@^2.0.0, pify@^2.3:
   version "2.3.0"
   resolved "https://npm.waste-time.today/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
   integrity sha1-7RQaasBDqEnqWISY59yosVMw6Qw=

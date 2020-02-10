@@ -10,6 +10,7 @@ export interface ConfigData {
   password: string;
   path: string;
   alwaysSave: string;
+  alwaysRestore: string;
 }
 
 export interface ConfigState {
@@ -18,6 +19,8 @@ export interface ConfigState {
 }
 
 export const SET_AUTOSAVE = '@CONFIG/SET_AUTO_SAVE' as const;
+
+export const SET_AUTORESTORE = '@CONFIG/SET_AUTO_RESTORE' as const;
 
 export const CONFIG_RELOAD = '@CONFIG/RELOAD' as const;
 
@@ -39,6 +42,29 @@ export const setAutoSave = (checked: boolean,
       } else {
         dispatch({
           type: SET_AUTOSAVE,
+          index,
+          checked,
+        });
+      }
+    });
+};
+
+export const setAutoRestore = (checked: boolean,
+  index: number): ThunkAction<Promise<void>, {
+    config: ConfigState
+  }, {}, AnyAction> => async (dispatch, getState) => {
+  const state = { ...getState().config };
+  // alert(JSON.stringify(state.config.clients));
+  state.clients[index].alwaysRestore = checked ? 'true' : 'false';
+  fs.writeFile(path.join(baseUrl, './config.json'),
+    JSON.stringify(state, null, 2),
+    (err) => {
+      if (err) {
+        remote.dialog.showErrorBox('설정 파일 저장 오류!',
+          '알 수 없는 이유로 설정 파일을 저장할 수 없었어요! T.T');
+      } else {
+        dispatch({
+          type: SET_AUTORESTORE,
           index,
           checked,
         });
@@ -95,6 +121,10 @@ export const setUserInfo = (username: string,
 
 export type ConfigActions = {
   type: typeof SET_AUTOSAVE,
+  index: number,
+  checked: boolean,
+} | {
+  type: typeof SET_AUTORESTORE,
   index: number,
   checked: boolean,
 } | {

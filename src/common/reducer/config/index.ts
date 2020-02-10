@@ -3,7 +3,7 @@ import path from 'path';
 import { Reducer } from 'redux';
 import { baseUrl } from '@common/constant';
 import {
-  ConfigState, ConfigActions, SET_AUTOSAVE, SET_USERINFO, CONFIG_RELOAD,
+  ConfigState, ConfigActions, SET_AUTOSAVE, SET_USERINFO, CONFIG_RELOAD, SET_AUTORESTORE,
 } from './action';
 
 const initState = (): ConfigState => {
@@ -25,6 +25,12 @@ const reducer = (state = initState(), action: ConfigActions) => {
       const newState = { ...state };
       const checked = action.checked ? 'true' : 'false';
       newState.clients[action.index].alwaysSave = checked;
+      return newState;
+    }
+    case SET_AUTORESTORE: {
+      const newState = { ...state };
+      const checked = action.checked ? 'true' : 'false';
+      newState.clients[action.index].alwaysRestore = checked;
       return newState;
     }
     case SET_USERINFO: {

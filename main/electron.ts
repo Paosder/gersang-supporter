@@ -94,6 +94,13 @@ const openConfigurationWindow = () => {
   const configUrl = `${baseUrl}#/configuration`;
   configWindow.loadURL(configUrl);
 };
+
+const restoreFiles = [
+  'config.ln',
+  'Gersang.exe',
+  'gersang.gcs',
+  'korean.gts',
+];
 // ///////////////////////////////////////////////////////
 // Main ----------------------------------
 
@@ -150,7 +157,7 @@ const logoutUser = () => {
   }
 };
 
-const createWindow = () => {
+const main = () => {
   // console.log(trayImg);
   tray = new Tray(trayImg);
   const contextmenu = Menu.buildFromTemplate([
@@ -215,7 +222,7 @@ const createWindow = () => {
 
   mainWindow = new BrowserWindow({
     width: 400,
-    height: 290,
+    height: 320,
     webPreferences: {
       nodeIntegration: true,
       devTools: process.env.NODE_ENV === 'development' || false,
@@ -255,11 +262,11 @@ const createWindow = () => {
   mainWindow.on('close', closeIE);
 };
 
-app.on('ready', createWindow);
+app.on('ready', main);
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    createWindow();
+    main();
   }
 });
 
@@ -452,9 +459,16 @@ ipcMain.on('gersang-directory', (event, index) => {
 interface CliArg {
   index: number;
   path: string;
+  restore: boolean;
+  restorePath: string;
 }
 
 ipcMain.on('execute-game', (event, cliArg: CliArg) => {
+  /**
+   * 1. set registry path to client's path.
+   * 2. restore client file if auto restore checked.
+   * 3. execute game via IE.
+   */
   regedit.putValue({
     'HKCU\\SOFTWARE\\JOYON\\Gersang\\Korean': {
       InstallPath: {
@@ -471,6 +485,14 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
         관리자 권한으로 실행시켰음에도 해당 오류가 발생되는 경우 denjaraos@gmail.com 으로 문의주세요.
         `);
     } else {
+      if (cliArg.restore && cliArg.index !== 0) {
+        // restore path related with client 0.
+        // except client-0 (origin).
+        restoreFiles.forEach((file) => {
+          fs.copyFileSync(path.join(cliArg.restorePath, file),
+            path.join(cliArg.path, file));
+        });
+      }
       const document = IE.Document;
       if (document) {
         document.parentWindow.execScript('gameStart(1)');

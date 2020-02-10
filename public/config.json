@@ -5,20 +5,23 @@
     {
       "username": "",
       "password": "",
-      "path": "C:\\AKInteractive\\Gersang-client1",
-      "alwaysSave": "false"
+      "path": "C:\\AKInteractive\\Gersang",
+      "alwaysSave": "false",
+      "alwaysRestore": "true"
     },
     {
       "username": "",
       "password": "",
-      "path": "C:\\AKInteractive\\Gersang-client2",
-      "alwaysSave": "false"
+      "path": "C:\\AKInteractive\\Gersang2",
+      "alwaysSave": "false",
+      "alwaysRestore": "true"
     },
     {
       "username": "",
       "password": "",
-      "path": "C:\\AKInteractive\\Gersang-client2",
-      "alwaysSave": "false"
+      "path": "C:\\AKInteractive\\Gersang3",
+      "alwaysSave": "false",
+      "alwaysRestore": "true"
     }
   ]
 }
