@@ -4,6 +4,7 @@ import React, {
 import Toggle from 'react-uwp/Toggle';
 import TextBox from 'react-uwp/TextBox';
 import IconButton from 'react-uwp/IconButton';
+import Button from 'react-uwp/Button';
 import Separator from 'react-uwp/Separator';
 import ToolTip from 'react-uwp/Tooltip';
 import Flyout from 'react-uwp/Flyout';
@@ -60,6 +61,7 @@ const Directory = styled.div`
 const ProgramInfo = styled.div`
   display: flex;
   flex-direction: row-reverse;
+  font-weight: bold;
 `;
 
 interface DirectoryInfo {
@@ -73,6 +75,10 @@ interface ConfigData {
   path: string;
   alwaysSave: boolean;
 }
+
+const openClientGenerator = () => {
+  ipcRenderer.send('open-client-generator', '');
+};
 
 const Configuration: React.FC<ThemeProps> = ({ theme }) => {
   const dirRef0 = useRef<TextBox>(null);
@@ -88,19 +94,22 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
       if (dirRef0 && dirRef0.current
         && dirRef1 && dirRef1.current
         && dirRef2 && dirRef2.current) {
-        dirRef0.current.setValue(config.clients[0].path);
-        dirRef1.current.setValue(config.clients[1].path);
-        dirRef2.current.setValue(config.clients[2].path);
+        dirRefs.forEach((dirRef, i) => {
+          dirRef.current!.setValue(config.clients[i].path);
+        });
       }
     }
-  }, [config, dirRef0, dirRef1, dirRef2]);
+  }, [config, dirRef0, dirRef1, dirRef2, dirRefs]);
 
-  const getNewDirectory = (targetIndex: number) => {
-    ipcRenderer.send('gersang-directory', targetIndex);
-  };
-
-  const setDir = useCallback((event, directory: DirectoryInfo) => {
-    dirRefs[directory.index].current!.setValue(directory.path);
+  const getNewDirectory = useCallback((targetIndex: number) => {
+    const res = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {
+      title: '거상 설치 경로 선택',
+      defaultPath: 'C:\\AKInteractive',
+      properties: ['openDirectory'],
+    });
+    if (res && res.length > 0) {
+      dirRefs[targetIndex].current!.setValue(res[0]);
+    }
   }, [dirRefs]);
 
   const saveAll = useCallback(() => {
@@ -118,17 +127,27 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
   }, [config, dirRefs, dispatch]);
 
   useEffect(() => {
-    ipcRenderer.on('gersang-directory', setDir);
-    return () => {
-      ipcRenderer.off('gersang-directory', setDir);
-    };
-  }, [setDir]);
-
-  useEffect(() => {
     ipcRenderer.on('change-config', () => {
       remote.getCurrentWindow().close();
     });
   }, []);
+
+  const paths = [];
+  for (let i = 0; i < 3; i += 1) {
+    paths.push(
+      <>
+        <DirectoryTitle style={theme?.typographyStyles?.base}>
+          거상 경로 1
+        </DirectoryTitle>
+        <Directory style={theme?.typographyStyles?.base}>
+          <TextBox background="none" ref={dirRefs[i]} />
+          <ToolTip content="폴더 열기">
+            <IconButton onClick={() => { getNewDirectory(i); }}>FileExplorerApp</IconButton>
+          </ToolTip>
+        </Directory>
+      </>,
+    );
+  }
 
   return (
     <ConfigLayout>
@@ -182,33 +201,11 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
         <Toggle label="OTP 입력 시 기본 별표 처리" defaultToggled />
         <Separator />
         <SectionTitle>경로</SectionTitle>
-        <DirectoryTitle style={theme?.typographyStyles?.base}>
-          거상 경로 1
-        </DirectoryTitle>
-        <Directory style={theme?.typographyStyles?.base}>
-          <TextBox background="none" ref={dirRef0} />
-          <ToolTip content="폴더 열기">
-            <IconButton onClick={() => { getNewDirectory(0); }}>FileExplorerApp</IconButton>
-          </ToolTip>
-        </Directory>
-        <DirectoryTitle style={theme?.typographyStyles?.base}>
-          거상 경로 2
-        </DirectoryTitle>
-        <Directory style={theme?.typographyStyles?.base}>
-          <TextBox background="none" ref={dirRef1} />
-          <ToolTip content="폴더 열기">
-            <IconButton onClick={() => { getNewDirectory(1); }}>FileExplorerApp</IconButton>
-          </ToolTip>
-        </Directory>
-        <DirectoryTitle style={theme?.typographyStyles?.base}>
-          거상 경로 3
-        </DirectoryTitle>
-        <Directory style={theme?.typographyStyles?.base}>
-          <TextBox background="none" ref={dirRef2} />
-          <ToolTip content="폴더 열기">
-            <IconButton onClick={() => { getNewDirectory(2); }}>FileExplorerApp</IconButton>
-          </ToolTip>
-        </Directory>
+        {paths}
+        <Button onClick={openClientGenerator}>
+            클라이언트 생성
+        </Button>
+        <Separator />
         <ProgramInfo>
           프로그램 정보...
         </ProgramInfo>

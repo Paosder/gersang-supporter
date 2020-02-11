@@ -8,7 +8,9 @@ import { Theme as UWPThemeProvider, getTheme } from 'react-uwp/Theme';
 import { NotificationIcon } from '@common/icons';
 import { Provider } from 'react-redux';
 import reducer from '@common/reducer';
-import { Main, Configuration, OTP } from './routes';
+import {
+  Main, Configuration, OTP, ClientGenerator,
+} from './routes';
 import generateStore from './store';
 import './App.css';
 
@@ -39,6 +41,7 @@ const App: React.FC = () => (
           <Route path="/main" component={Main} />
           <Route path="/configuration" component={Configuration} />
           <Route path="/otp" component={OTP} />
+          <Route path="/client-generator" component={ClientGenerator} />
         </HashRouter>
       </UWPThemeProvider>
     </Provider>

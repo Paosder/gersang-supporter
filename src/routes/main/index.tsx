@@ -42,48 +42,43 @@ const Features = styled.div`
 
 
 const openConfig = () => {
-  ipcRenderer.send('configuration', '');
+  ipcRenderer.send('open-configuration', '');
 };
 
-const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
-  // alert(match.url);
-  const t = 4;
-  return (
-    <MainLayout>
-      <LeftMenu>
-        <Features>
-          <Link to={`${match.path}`}>
-            <IconButton>
+const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
+  <MainLayout>
+    <LeftMenu>
+      <Features>
+        <Link to={`${match.path}`}>
+          <IconButton>
               GuestUser
-            </IconButton>
-          </Link>
-          <Link to={`${match.url}/clock`}>
-            <IconButton>
+          </IconButton>
+        </Link>
+        <Link to={`${match.url}/clock`}>
+          <IconButton>
               ClockLegacy
-            </IconButton>
-          </Link>
-          <IconButton>
+          </IconButton>
+        </Link>
+        <IconButton>
             CalculatorLegacy
-          </IconButton>
-          <IconButton>
+        </IconButton>
+        <IconButton>
             CharactersLegacy
-          </IconButton>
-          {/* <IconButton>
+        </IconButton>
+        {/* <IconButton>
             ChatBubbles
           </IconButton> */}
-        </Features>
-        <IconButton
-          onClick={openConfig}
-        >
+      </Features>
+      <IconButton
+        onClick={openConfig}
+      >
         SettingsLegacy
-        </IconButton>
-      </LeftMenu>
-      <Switch>
-        <Route exact path={match.path} component={LoginForm} />
-        <Route path={`${match.path}/clock`} component={Clock} />
-      </Switch>
-    </MainLayout>
-  );
-};
-
+      </IconButton>
+    </LeftMenu>
+    <Switch>
+      <Route exact path={match.path} component={LoginForm} />
+      <Route path={`${match.path}/clock`} component={Clock} />
+    </Switch>
+  </MainLayout>
+);
 export default Main;
