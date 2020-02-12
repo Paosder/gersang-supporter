@@ -68,6 +68,18 @@ require('winax');
 // ///////////////////////////////////////////////////////
 // common const ----------------------------------------
 
+let tray: Tray;
+
+let mainWindow: Electron.BrowserWindow;
+
+let configWindow: Electron.BrowserWindow;
+
+let ClientGeneratorWindow: Electron.BrowserWindow;
+
+let otpWindow: Electron.BrowserWindow;
+
+let IE: any;
+
 const baseUrl = process.env.ELECTRON_START_URL || url.format({
   pathname: path.join(__dirname, '../build/index.html'),
   protocol: 'file:',
@@ -95,6 +107,25 @@ const openConfigurationWindow = () => {
   configWindow.loadURL(configUrl);
 };
 
+const openClientGeneratorWindow = () => {
+  ClientGeneratorWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    parent: configWindow,
+    modal: true,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+    icon: trayImg,
+  });
+  ClientGeneratorWindow.setMenu(null);
+  const configUrl = `${baseUrl}#/client-generator`;
+  ClientGeneratorWindow.loadURL(configUrl);
+};
+
 const restoreFiles = [
   'config.ln',
   'Gersang.exe',
@@ -103,17 +134,6 @@ const restoreFiles = [
 ];
 // ///////////////////////////////////////////////////////
 // Main ----------------------------------
-
-
-let tray: Tray;
-
-let mainWindow: Electron.BrowserWindow;
-
-let configWindow: Electron.BrowserWindow;
-
-let otpWindow: Electron.BrowserWindow;
-
-let IE: any;
 
 const waitBusy = (limit: number = 10000) => new Promise((resolve, reject) => {
   let elapsed = 0;
@@ -157,8 +177,9 @@ const logoutUser = () => {
   }
 };
 
+// Main Entry Function
+
 const main = () => {
-  // console.log(trayImg);
   tray = new Tray(trayImg);
   const contextmenu = Menu.buildFromTemplate([
     {
@@ -442,20 +463,6 @@ ipcMain.on('request-logout', (event, forced?: boolean) => {
   }
 });
 
-ipcMain.on('gersang-directory', (event, index) => {
-  const res = dialog.showOpenDialogSync(mainWindow, {
-    title: '거상 설치 경로 선택',
-    defaultPath: 'C:\\AKInteractive',
-    properties: ['openDirectory'],
-  });
-  if (res && res.length > 0) {
-    event.reply('gersang-directory', {
-      path: res[0],
-      index,
-    });
-  }
-});
-
 interface CliArg {
   index: number;
   path: string;
@@ -506,8 +513,12 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
 });
 
 
-ipcMain.on('configuration', (event, arg) => {
+ipcMain.on('open-configuration', (event, arg) => {
   openConfigurationWindow();
+});
+
+ipcMain.on('open-client-generator', (event, arg) => {
+  openClientGeneratorWindow();
 });
 
 ipcMain.on('change-config', (event, silent: boolean) => {
