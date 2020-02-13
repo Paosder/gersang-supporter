@@ -80,6 +80,8 @@ let otpWindow: Electron.BrowserWindow;
 
 let IE: any;
 
+let TEMP_TOGGLE_BROWSER = false;
+
 const baseUrl = process.env.ELECTRON_START_URL || url.format({
   pathname: path.join(__dirname, '../build/index.html'),
   protocol: 'file:',
@@ -310,7 +312,7 @@ ipcMain.on('request-login', async (event, arg) => {
   closeIE();
   mainWindow.setProgressBar(0.1);
   IE = new ActiveXObject('InternetExplorer.Application');
-  IE.Visible = false;
+  IE.Visible = TEMP_TOGGLE_BROWSER;
   IE.silent = true;
   try {
     IE.navigate('http://www.gersang.co.kr/main.gs');
@@ -534,4 +536,15 @@ ipcMain.on('change-config', (event, silent: boolean) => {
     configWindow.webContents.send('change-config'); // to close
     configWindow = null;
   }
+});
+
+ipcMain.on('toggle-browser', () => {
+  TEMP_TOGGLE_BROWSER = !TEMP_TOGGLE_BROWSER;
+  const msg = TEMP_TOGGLE_BROWSER ? '브라우저가 열리도록 설정되었습니다'
+    : '브라우저가 열리지 않도록 설정되었습니다';
+  dialog.showMessageBox(mainWindow, {
+    title: '상태 변경',
+    type: 'info',
+    message: msg,
+  });
 });
