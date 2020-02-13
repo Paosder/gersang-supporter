@@ -59,12 +59,12 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
               ClockLegacy
           </IconButton>
         </Link>
-        <IconButton>
+        {/* <IconButton>
             CalculatorLegacy
         </IconButton>
         <IconButton>
             CharactersLegacy
-        </IconButton>
+        </IconButton> */}
         {/* <IconButton>
             ChatBubbles
           </IconButton> */}

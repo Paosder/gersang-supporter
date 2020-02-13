@@ -80,6 +80,10 @@ const openClientGenerator = () => {
   ipcRenderer.send('open-client-generator', '');
 };
 
+const toggleBrowserOpen = () => {
+  ipcRenderer.send('toggle-browser');
+};
+
 const Configuration: React.FC<ThemeProps> = ({ theme }) => {
   const dirRef0 = useRef<TextBox>(null);
   const dirRef1 = useRef<TextBox>(null);
@@ -199,6 +203,19 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
           </FlyoutContent>
         </Flyout>
         <Toggle label="OTP 입력 시 기본 별표 처리" defaultToggled />
+        <Flyout>
+          <Button onClick={toggleBrowserOpen}>
+            브라우저 열기/닫기 (임시)
+          </Button>
+          <FlyoutContent
+            show={false}
+            verticalPosition="bottom"
+            enterDelay={850}
+          >
+            로그인 시 브라우저를 수동으로 엽니다(임시 기능).
+            만약 브라우저를 사용자 임의대로 닫을 경우 프로그램이 정상동작하지 않을 수도 있습니다. 유의해주세요.
+          </FlyoutContent>
+        </Flyout>
         <Separator />
         <SectionTitle>경로</SectionTitle>
         {paths}
