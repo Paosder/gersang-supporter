@@ -1,7 +1,9 @@
 # Gersang Supporter
 
-Gersang browser + timer + simulator
+Gersang browser + timer + calculator
+
+![main](./screenshots/main.png)
 
 ## Prerequisites
 
-[registry-js](https://github.com/desktop/registry-js/blob/master/docs/index.md)
+- windows-build-tools
