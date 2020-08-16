@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.paths",
   "name": "gersang-supporter",
-  "version": "1.0.0-alpha-2",
+  "version": "1.0.0-alpha-3",
   "private": true,
   "author": "Paosder",
   "dependencies": {
