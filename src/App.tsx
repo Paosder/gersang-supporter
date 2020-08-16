@@ -17,6 +17,7 @@ import './App.css';
 const store = generateStore(reducer);
 
 ipcRenderer.on('hide', () => {
+  // eslint-disable-next-line
   const notification = new Notification('Gersang Supporter', {
     icon: NotificationIcon,
     body: '트레이 아이콘으로 숨깁니다.',

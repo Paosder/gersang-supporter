@@ -1,20 +1,45 @@
 import { Reducer } from 'redux';
-import { EnumLoginState, MainActions, LoginState } from './action';
+import {
+  EnumLoginState, MainActions, LoginState,
+  REINIT_ACTIVE_CLIENTS, SET_STATUS,
+} from './action';
 
 
 const initState = (): LoginState => ({
-  status: EnumLoginState.LOGOUT,
-  clientIndex: 0,
+  clients: [{
+    status: EnumLoginState.LOGOUT,
+  }, {
+    status: EnumLoginState.LOGOUT,
+  }, {
+    status: EnumLoginState.LOGOUT,
+  }],
 });
 
 
 const reducer = (state = initState(), action: MainActions) => {
   switch (action.type) {
-    case '@MAIN/SET_STATUS':
-      return {
-        status: action.status,
-        clientIndex: action.index,
+    case SET_STATUS: {
+      const newState = {
+        ...state,
       };
+      newState.clients[action.payload.index].status = action.payload.status;
+      return newState;
+    }
+    case REINIT_ACTIVE_CLIENTS: {
+      const newClients = [];
+      for (let i = 0; i < action.payload.clientLength; i += 1) {
+        newClients.push({
+          status: EnumLoginState.LOGOUT,
+        });
+        if (state.clients[i]) {
+          // copy current state if exists.
+          newClients[i].status = state.clients[i].status;
+        }
+      }
+      return {
+        clients: newClients,
+      };
+    }
     default:
       break;
   }

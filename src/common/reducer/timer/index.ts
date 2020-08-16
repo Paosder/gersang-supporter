@@ -33,6 +33,7 @@ const reducer = (state = initState(), action: TimerActions) => {
     case DECREASE_LEFT_TIME: {
       if (state.status === 'START'
         && state.leftTime - action.time < 0) {
+        // eslint-disable-next-line
         const t = new Notification('Gersang Supporter', {
           icon: NotificationIcon,
           body: '시간이 경과되었어요 !',

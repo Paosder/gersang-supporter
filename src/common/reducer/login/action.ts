@@ -1,5 +1,7 @@
 export const SET_STATUS = '@MAIN/SET_STATUS' as const;
 
+export const REINIT_ACTIVE_CLIENTS = '@MAIN/REINIT_ACTIVE_CLIENTS' as const;
+
 export enum EnumLoginState {
   AUTH_FAILED,
   LOGOUT,
@@ -10,14 +12,25 @@ export enum EnumLoginState {
 }
 
 export interface LoginState {
-  status: EnumLoginState;
-  clientIndex: number;
+  clients: Array<{
+    status: EnumLoginState;
+  }>
 }
 
 export const setStatus = (index: number, status: EnumLoginState) => ({
   type: SET_STATUS,
-  index,
-  status,
+  payload: {
+    index,
+    status,
+  },
 });
 
-export type MainActions = ReturnType<typeof setStatus>;
+export const reInitActiveClients = (clientLength: number) => ({
+  type: REINIT_ACTIVE_CLIENTS,
+  payload: {
+    clientLength,
+  },
+});
+
+export type MainActions = ReturnType<typeof setStatus> |
+  ReturnType<typeof reInitActiveClients>;

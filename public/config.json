@@ -3,6 +3,7 @@
   "encrypted": "true",
   "clients": [
     {
+      "title": "",
       "username": "",
       "password": "",
       "path": "C:\\AKInteractive\\Gersang",
@@ -10,6 +11,7 @@
       "alwaysRestore": "true"
     },
     {
+      "title": "",
       "username": "",
       "password": "",
       "path": "C:\\AKInteractive\\Gersang2",
@@ -17,9 +19,18 @@
       "alwaysRestore": "true"
     },
     {
+      "title": "",
       "username": "",
       "password": "",
       "path": "C:\\AKInteractive\\Gersang3",
+      "alwaysSave": "false",
+      "alwaysRestore": "true"
+    },
+    {
+      "title": "상재용 서브",
+      "username": "",
+      "password": "",
+      "path": "C:\\AKInteractive\\Gersang4",
       "alwaysSave": "false",
       "alwaysRestore": "true"
     }
