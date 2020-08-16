@@ -1,6 +1,20 @@
 import { ipcRenderer } from 'electron';
 
-export const reqLogin = (index: number, id: string, password: string) => {
+export type ResponseCallback = (args: any) => void;
+
+const registerCallback = (channel: string, callback?: ResponseCallback) => {
+  if (callback) {
+    const gcCallback = (args: any) => {
+      ipcRenderer.off(channel, gcCallback);
+      callback(args);
+    };
+    ipcRenderer.on(channel, gcCallback);
+  }
+};
+
+export const reqLogin = (index: number, id: string,
+  password: string, callback?: ResponseCallback) => {
+  registerCallback('request-login', callback);
   ipcRenderer.send('request-login', {
     id,
     password,
@@ -25,7 +39,8 @@ export const reqGameExecute = (index: number,
   }); // set client number
 };
 
-export const reqOtpAuthKeys = (data: string) => {
+export const reqOtpAuthKeys = (data: string, callback?: ResponseCallback) => {
+  registerCallback('request-otp', callback);
   ipcRenderer.send('request-otp', data);
 };
 

@@ -343,11 +343,12 @@ ipcMain.on('request-login', async (event, arg) => {
   } catch (e) {
     dialog.showErrorBox('IE 오류!',
       '인터넷이 연결되어있지 않을 수도 있어요!');
-    event.reply('response-logout', {
+    event.reply('request-logout', {
       error: true,
       reason: 'login-failed',
     });
     mainWindow.setProgressBar(0);
+    closeIE(index);
     return;
   }
   mainWindow.setProgressBar(0.2);
@@ -364,11 +365,12 @@ ipcMain.on('request-login', async (event, arg) => {
       `로그인 중 알 수 없는 문제가 발생했습니다.
 홈페이지가 정상적이지 않을 수도 있습니다.
 해당 증상이 반복될 경우 https://github.com/Paosder/gersang-supporter/issues 으로 문의주시면 감사하겠습니다.`);
-    event.reply('response-logout', {
+    event.reply('request-logout', {
       error: true,
       reason: 'login-failed',
     });
     mainWindow.setProgressBar(0);
+    closeIE(index);
     return;
   }
 
@@ -379,12 +381,13 @@ ipcMain.on('request-login', async (event, arg) => {
     await waitBusy(index);
   } catch {
     IE[index].Application.Quit();
-    event.reply('response-logout', {
+    event.reply('request-logout', {
       error: true,
       reason: 'login-failed',
     });
     dialog.showErrorBox('계정 오류!', '아이디 혹은 비밀번호가 틀린가봐요 T.T');
     mainWindow.setProgressBar(0);
+    closeIE(index);
     return;
   }
 
@@ -392,7 +395,7 @@ ipcMain.on('request-login', async (event, arg) => {
 
   if (otp) {
     // remoteAlert();
-    event.reply('response-login', {
+    event.reply('request-login', {
       status: false,
       reason: 'otp-required',
     });
@@ -418,16 +421,17 @@ ipcMain.on('request-login', async (event, arg) => {
     await waitBusy(index);
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
-      event.reply('response-login', {
+      event.reply('request-login', {
         status: true,
         reason: 'success-without-otp',
       });
       mainWindow.setProgressBar(0);
     } else {
-      mainWindow.webContents.send('response-logout', {
+      mainWindow.webContents.send('request-logout', {
         error: true,
         reason: 'login-error',
       });
+      closeIE(index);
     }
   }
 });
@@ -442,12 +446,13 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   try {
     await waitBusy(currentIndex);
   } catch {
-    mainWindow.webContents.send('response-logout', {
+    mainWindow.webContents.send('request-logout', {
       error: true,
       reason: 'wrong-number-otp',
     });
     dialog.showErrorBox('OTP 오류!', '인증 번호가 맞지 않습니다!');
     mainWindow.setProgressBar(0);
+    closeIE(index);
     return;
   }
   for (let i = 0; i < 2; i += 1) {
@@ -456,21 +461,22 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     await waitBusy(currentIndex); // eslint-disable-line
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
-      mainWindow.webContents.send('response-login', {
+      mainWindow.webContents.send('request-login', {
         status: true,
         reason: 'success-with-otp',
       });
-      mainWindow.setProgressBar(0);
+      mainWindow.setProgressBar(100);
       return;
     }
   }
   dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
   개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
   https://github.com/Paosder/gersang-supporter/issues`);
-  mainWindow.webContents.send('response-logout', {
+  mainWindow.webContents.send('request-logout', {
     status: false,
     reason: 'fail-with-otp',
   });
+  closeIE(index);
 });
 
 interface LogoutArgs {
@@ -481,18 +487,20 @@ interface LogoutArgs {
 ipcMain.on('request-logout', (event, args: LogoutArgs) => {
   mainWindow.setProgressBar(0);
   if (args.forced) {
-    mainWindow.webContents.send('response-logout', {
+    mainWindow.webContents.send('request-logout', {
       error: true,
       reason: 'cancel-otp',
     });
     dialog.showErrorBox('OTP 취소!', 'OTP 인증을 취소하였습니다.');
     logoutUser(currentIndex);
+    closeIE(index);
   } else {
-    mainWindow.webContents.send('response-logout', {
+    mainWindow.webContents.send('request-logout', {
       error: false,
       reason: 'success-logout',
     });
     logoutUser(args.index);
+    closeIE(index);
   }
 });
 

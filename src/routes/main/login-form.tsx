@@ -184,11 +184,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ index }) => {
       }
       dispatch(setStatus(index, LoginState.LOGOUT));
     };
-    ipcRenderer.on('response-login', responseLoginCallback);
-    ipcRenderer.on('response-logout', responseLogoutCallback);
+    ipcRenderer.on('request-login', responseLoginCallback);
+    ipcRenderer.on('request-logout', responseLogoutCallback);
     return () => {
-      ipcRenderer.off('response-login', responseLoginCallback);
-      ipcRenderer.off('response-logout', responseLogoutCallback);
+      ipcRenderer.off('request-login', responseLoginCallback);
+      ipcRenderer.off('request-logout', responseLogoutCallback);
     };
   }, [config.alwaysSave, dispatch, index, idRef, pwRef]);
 

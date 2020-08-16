@@ -6,10 +6,11 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import IconButton from 'react-uwp/IconButton';
 import { ThemeProps } from 'react-uwp';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { GlobalState } from '@common/reducer';
 import { EnumLoginState } from '@common/reducer/login/types';
 import { reqGameExecute, reqOpenConfig } from '@common/ipc/req';
+import { executeDirect } from '@common/reducer/login/action';
 import LoginForm from './login';
 import Clock from './clock';
 
@@ -18,7 +19,6 @@ const MainLayout = styled.div`
   width: 100%;
   height: 100%;
   background-color: #eeeeee;
-  /* justify-content: space-between; */
 
   > * {
     flex-grow: 1;
@@ -26,7 +26,6 @@ const MainLayout = styled.div`
 
   > :first-child {
     flex: none;
-    /* background-color: rgb(0, 120, 215); */
   }
 `;
 
@@ -50,16 +49,18 @@ interface ExecuteAccountArgs {
 const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
   const configClients = useSelector((state: GlobalState) => state.config.clients);
   const loginClients = useSelector((state: GlobalState) => state.login.clients);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const executeAccount = (e: Electron.IpcRendererEvent, args: ExecuteAccountArgs) => {
       console.log(args);
-      if (loginClients[args.index].status === EnumLoginState.LOGIN) {
-        // already login.
-        reqGameExecute(args.index, configClients[args.index].path,
-          configClients[args.index].alwaysRestore === 'true',
-          configClients[0].path);
-      }
+      dispatch(executeDirect(args.index));
+      // if (loginClients[args.index].status === EnumLoginState.LOGIN) {
+      //   // already login.
+      //   reqGameExecute(args.index, configClients[args.index].path,
+      //     configClients[args.index].alwaysRestore === 'true',
+      //     configClients[0].path);
+      // }
     };
 
     ipcRenderer.on('execute-client', executeAccount);
@@ -67,7 +68,7 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
     return () => {
       ipcRenderer.off('execute-client', executeAccount);
     };
-  }, [configClients, loginClients]);
+  }, [configClients, dispatch, loginClients]);
 
   return (
   <MainLayout>
