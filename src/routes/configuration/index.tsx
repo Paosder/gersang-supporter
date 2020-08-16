@@ -137,11 +137,15 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
   }, []);
 
   const paths = [];
-  for (let i = 0; i < 3; i += 1) {
+  for (let i = 0; i < config.clients.length; i += 1) {
     paths.push(
       <>
         <DirectoryTitle style={theme?.typographyStyles?.base}>
-          거상 경로 1
+          거상 경로(
+          {i + 1}
+          ):
+          {' '}
+          {config.clients[i].title ? config.clients[i].title : `${i + 1}번`}
         </DirectoryTitle>
         <Directory style={theme?.typographyStyles?.base}>
           <TextBox background="none" ref={dirRefs[i]} />
