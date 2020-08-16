@@ -1,6 +1,7 @@
 import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { reqGameExecute, reqLogin, registerCallback } from '@common/ipc/req';
+import { ipcRenderer, remote } from 'electron';
 import { ConfigState } from '../config/types';
 import { EnumLoginState, LoginState } from './types';
 
@@ -44,6 +45,16 @@ export const executeDirect = (index: number): ThunkAction<Promise<void>, {
     case EnumLoginState.LOGOUT: {
       // not login state (first phase).
       const { username, password } = configClients[index];
+      if (!username || !password) {
+        remote.dialog.showErrorBox('아이디 비밀번호가 이상해요!', `
+          아이디, 비밀번호가 이상해요!
+          혹시 이전에 한번이라도 로그인을 안하셨던게 아닐까요?
+
+          인식된 아이디: '${username}'
+          인식된 비밀번호: '${password.split('').map(() => '●').join()}'
+        `);
+        return;
+      }
       reqLogin(index, username, password, (res: { status: boolean, reason: string}) => {
         if (res.status) {
           // true. go next stage.
@@ -63,21 +74,7 @@ export const executeDirect = (index: number): ThunkAction<Promise<void>, {
         }
       });
     }
-    default:
-      break;
-      // wrong?
   }
-  // dispatch again to wait next response.
-  // dispatch(executeDirect(index));
-  // dispatch({
-  //   type: SET_USERINFO,
-  //   payload: {
-  //     username: encrypt(username),
-  //     password: encrypt(password),
-  //     index,
-  //   },
-  // });
-  // dispatch(saveConfig({ doEncrypt: getState().config.encrypted === 'true' }, true));
 };
 
 export type MainActions = ReturnType<typeof setStatus> |

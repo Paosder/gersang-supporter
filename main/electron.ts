@@ -78,6 +78,8 @@ let ClientGeneratorWindow: Electron.BrowserWindow;
 
 let otpWindow: Electron.BrowserWindow;
 
+let loadingWindow: Electron.BrowserWindow;
+
 const IE: any[] = []; // IE object for each account.
 
 let currentIndex = 0;
@@ -244,6 +246,24 @@ const main = () => {
 
   // close background IE when app close
   mainWindow.on('close', closeIE);
+
+  loadingWindow = new BrowserWindow(
+    {
+      width: 400,
+      height: 400,
+      frame: false,
+      webPreferences: {
+        nodeIntegration: true,
+        devTools: process.env.NODE_ENV === 'development' || false,
+        backgroundThrottling: false,
+      },
+      transparent: true,
+      icon: trayImg,
+    },
+  );
+  loadingWindow.setIgnoreMouseEvents(true);
+  const loadingUrl = `${baseUrl}#/loading`;
+  loadingWindow.loadURL(loadingUrl);
 };
 
 app.on('ready', main);
@@ -281,6 +301,9 @@ ipcMain.on('build-traymenu', (event, args: TrayMenuInfo) => {
     label: `${el.title || `${el.index + 1}번`}(으)로 시작`,
     type: 'normal',
     click: () => {
+      loadingWindow.restore();
+      loadingWindow.focus();
+      loadingWindow.webContents.send('loading-screen', '');
       mainWindow.webContents.send('execute-client', {
         index: el.index,
       });
