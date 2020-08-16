@@ -78,7 +78,9 @@ let ClientGeneratorWindow: Electron.BrowserWindow;
 
 let otpWindow: Electron.BrowserWindow;
 
-let IE: any;
+const IE: any[] = []; // IE object for each account.
+
+let currentIndex = 0;
 
 let TEMP_TOGGLE_BROWSER = false;
 
@@ -165,14 +167,23 @@ const waitBusy = (limit: number = 10000) => new Promise((resolve, reject) => {
   setTimeout(p, 100);
 });
 
-const closeIE = () => {
-  if (IE && IE.Application) {
-    IE.Application.Quit();
+const closeIE = (index?: number) => {
+  if (index === undefined) {
+    // close all.
+    IE.forEach((el) => {
+      if (el && el.Application) {
+        el.Application.Quit();
+        el = undefined;
+      }
+    });
+  } else if (IE[index] && IE[index].Application) {
+    IE[index].Application.Quit();
+    IE[index] = undefined;
   }
 };
 
-const logoutUser = () => {
-  const document = IE.Document;
+const logoutUser = (index: number) => {
+  const document = IE[index].Document;
   const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
   if (logout) {
     logout.click();
@@ -244,7 +255,7 @@ const main = () => {
   tray.setContextMenu(contextmenu);
 
   mainWindow = new BrowserWindow({
-    width: 400,
+    width: 425,
     height: 320,
     webPreferences: {
       nodeIntegration: true,
@@ -309,17 +320,22 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
 // IPC Communications ----------------------------------
 
 ipcMain.on('request-login', async (event, arg) => {
-  closeIE();
+  const { index, id, password } = arg;
+  console.log(index, id, password);
+  closeIE(index);
   mainWindow.setProgressBar(0.1);
-  IE = new ActiveXObject('InternetExplorer.Application');
-  IE.Visible = TEMP_TOGGLE_BROWSER;
-  IE.silent = true;
+  IE[index] = new ActiveXObject('InternetExplorer.Application');
+  IE[index].Visible = TEMP_TOGGLE_BROWSER;
+  IE[index].silent = true;
+  currentIndex = index;
   try {
-    IE.navigate('http://www.gersang.co.kr/main.gs');
+    IE[index].navigate('http://www.gersang.co.kr/main.gs');
     await waitBusy();
-    logoutUser();
+    return;
+
+    logoutUser(index);
     await waitBusy();
-    IE.navigate('http://www.gersang.co.kr/pub/logi/login/login.gs?returnUrl=www.gersang.co.kr%2Fmain.gs');
+    IE[index].navigate('http://www.gersang.co.kr/pub/logi/login/login.gs?returnUrl=www.gersang.co.kr%2Fmain.gs');
     await waitBusy();
   } catch (e) {
     dialog.showErrorBox('IE 오류!',
@@ -327,12 +343,12 @@ ipcMain.on('request-login', async (event, arg) => {
   }
   mainWindow.setProgressBar(0.2);
 
-  const document = IE.Document;
+  const document = IE[index].Document;
   const t = document.querySelector('[name=GSuserID]');
   const p = document.querySelector('[name=GSuserPW]');
   try {
-    t.innerText = arg.id;
-    p.innerText = arg.password;
+    t.innerText = id;
+    p.innerText = password;
     mainWindow.setProgressBar(0.5);
   } catch (e) {
     dialog.showErrorBox('로그인 오류!',
@@ -353,7 +369,7 @@ ipcMain.on('request-login', async (event, arg) => {
   try {
     await waitBusy();
   } catch {
-    IE.Application.Quit();
+    IE[index].Application.Quit();
     event.reply('response-logout', {
       error: true,
       reason: 'login-failed',
@@ -389,7 +405,7 @@ ipcMain.on('request-login', async (event, arg) => {
     otpWindow.loadURL(otpUrl);
     mainWindow.setProgressBar(0.75);
   } else {
-    IE.navigate('http://www.gersang.co.kr/main.gs');
+    IE[index].navigate('http://www.gersang.co.kr/main.gs');
     await waitBusy();
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
@@ -409,7 +425,7 @@ ipcMain.on('request-login', async (event, arg) => {
 
 ipcMain.on('request-otp', async (event, otpData: string) => {
   // remoteAlert();
-  const document = IE.Document;
+  const document = IE[currentIndex].Document;
 
   const otp = document.querySelector('[name=GSotpNo]');
   otp.innerText = otpData;
@@ -427,7 +443,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   }
   for (let i = 0; i < 2; i += 1) {
     // cross check twice (occationally fails at first time)
-    IE.navigate('https://www.gersang.co.kr/main.gs');
+    IE[currentIndex].navigate('https://www.gersang.co.kr/main.gs');
     await waitBusy(); // eslint-disable-line
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
@@ -448,7 +464,12 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   });
 });
 
-ipcMain.on('request-logout', (event, forced?: boolean) => {
+interface LogoutArgs {
+  index: number;
+  forced?: boolean;
+}
+
+ipcMain.on('request-logout', (event, args: LogoutArgs) => {
   mainWindow.setProgressBar(0);
   if (forced) {
     mainWindow.webContents.send('response-logout', {
@@ -461,7 +482,7 @@ ipcMain.on('request-logout', (event, forced?: boolean) => {
       error: false,
       reason: 'success-logout',
     });
-    logoutUser();
+    logoutUser(args.index);
   }
 });
 
@@ -502,7 +523,7 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
             path.join(cliArg.path, file));
         });
       }
-      const document = IE.Document;
+      const document = IE[index].Document;
       if (document) {
         document.parentWindow.execScript('gameStart(1)');
       } else {

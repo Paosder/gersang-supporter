@@ -11,6 +11,7 @@ export interface ConfigData {
   path: string;
   alwaysSave: string;
   alwaysRestore: string;
+  title?: string;
 }
 
 export interface ConfigState {
@@ -42,8 +43,10 @@ export const setAutoSave = (checked: boolean,
       } else {
         dispatch({
           type: SET_AUTOSAVE,
-          index,
-          checked,
+          payload: {
+            index,
+            checked,
+          },
         });
       }
     });
@@ -65,8 +68,10 @@ export const setAutoRestore = (checked: boolean,
       } else {
         dispatch({
           type: SET_AUTORESTORE,
-          index,
-          checked,
+          payload: {
+            index,
+            checked,
+          },
         });
       }
     });
@@ -112,26 +117,34 @@ export const setUserInfo = (username: string,
   }, {}, AnyAction> => async (dispatch, getState) => {
   dispatch({
     type: SET_USERINFO,
-    username: encrypt(username),
-    password: encrypt(password),
-    index,
+    payload: {
+      username: encrypt(username),
+      password: encrypt(password),
+      index,
+    },
   });
   dispatch(saveConfig({ doEncrypt: getState().config.encrypted === 'true' }, true));
 };
 
 export type ConfigActions = {
   type: typeof SET_AUTOSAVE,
-  index: number,
-  checked: boolean,
+  payload: {
+    index: number,
+    checked: boolean,
+  }
 } | {
   type: typeof SET_AUTORESTORE,
-  index: number,
-  checked: boolean,
+  payload: {
+    index: number,
+    checked: boolean,
+  }
 } | {
   type: typeof SET_USERINFO,
-  username: string,
-  password: string,
-  index: number,
+  payload: {
+    username: string,
+    password: string,
+    index: number,
+  }
 } | {
   type: typeof CONFIG_RELOAD,
 };

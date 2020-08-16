@@ -23,20 +23,20 @@ const reducer = (state = initState(), action: ConfigActions) => {
   switch (action.type) {
     case SET_AUTOSAVE: {
       const newState = { ...state };
-      const checked = action.checked ? 'true' : 'false';
-      newState.clients[action.index].alwaysSave = checked;
+      const checked = action.payload.checked ? 'true' : 'false';
+      newState.clients[action.payload.index].alwaysSave = checked;
       return newState;
     }
     case SET_AUTORESTORE: {
       const newState = { ...state };
-      const checked = action.checked ? 'true' : 'false';
-      newState.clients[action.index].alwaysRestore = checked;
+      const checked = action.payload.checked ? 'true' : 'false';
+      newState.clients[action.payload.index].alwaysRestore = checked;
       return newState;
     }
     case SET_USERINFO: {
       const newState = { ...state };
-      newState.clients[action.index].username = action.username;
-      newState.clients[action.index].password = action.password;
+      newState.clients[action.payload.index].username = action.payload.username;
+      newState.clients[action.payload.index].password = action.payload.password;
       return newState;
     }
     case CONFIG_RELOAD: {
