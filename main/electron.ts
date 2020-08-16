@@ -301,9 +301,9 @@ ipcMain.on('build-traymenu', (event, args: TrayMenuInfo) => {
     label: `${el.title || `${el.index + 1}번`}(으)로 시작`,
     type: 'normal',
     click: () => {
-      loadingWindow.restore();
-      loadingWindow.focus();
-      loadingWindow.webContents.send('loading-screen', '');
+      // loadingWindow.restore();
+      // loadingWindow.focus();
+      // loadingWindow.webContents.send('loading-screen', '');
       mainWindow.webContents.send('execute-client', {
         index: el.index,
       });
@@ -552,7 +552,13 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
       }
       const document = IE[cliArg.index].Document;
       if (document) {
-        document.parentWindow.execScript('gameStart(1)');
+        try {
+          document.parentWindow.execScript('gameStart(1)');
+        } catch {
+          dialog.showErrorBox('게임 실행 실패!',
+            `거상 ActiveX가 설치 되어있지 않은 것 같아요.
+          수동으로 1회 실행한 후 다시 시도해주세요.`);
+        }
       } else {
         dialog.showErrorBox('게임 실행 실패!',
           `로그인이 정상적으로 되지 않았거나, 홈페이지가 이상합니다. T.T
