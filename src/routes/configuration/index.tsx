@@ -1,5 +1,5 @@
 import React, {
-  useRef, useEffect, useCallback,
+  useRef, useEffect, useCallback, useState, createRef, RefObject,
 } from 'react';
 import Toggle from 'react-uwp/Toggle';
 import TextBox from 'react-uwp/TextBox';
@@ -85,25 +85,31 @@ const toggleBrowserOpen = () => {
 };
 
 const Configuration: React.FC<ThemeProps> = ({ theme }) => {
-  const dirRef0 = useRef<TextBox>(null);
-  const dirRef1 = useRef<TextBox>(null);
-  const dirRef2 = useRef<TextBox>(null);
   const encryptRef = useRef<Toggle>(null);
-  const dirRefs = [dirRef0, dirRef1, dirRef2];
   const config = useSelector((state: GlobalState) => state.config);
+
+  const [dirRefs, setDirRefs] = useState<Array<RefObject<TextBox>>>([]);
+
+  useEffect(() => {
+    // add or remove refs
+    setDirRefs((el) => (
+      Array(config.clients.length).fill(null).map((_, i) => el[i] || createRef<TextBox>())
+    ));
+  }, [config.clients.length]);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (config) {
-      if (dirRef0 && dirRef0.current
-        && dirRef1 && dirRef1.current
-        && dirRef2 && dirRef2.current) {
-        dirRefs.forEach((dirRef, i) => {
-          dirRef.current!.setValue(config.clients[i].path);
-        });
+      for (const el of dirRefs) {
+        if (!el || !el.current) {
+          return;
+        }
       }
+      dirRefs.forEach((dirRef, i) => {
+        dirRef.current!.setValue(config.clients[i].path);
+      });
     }
-  }, [config, dirRef0, dirRef1, dirRef2, dirRefs]);
+  }, [config, dirRefs]);
 
   const getNewDirectory = useCallback((targetIndex: number) => {
     const res = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {
@@ -118,10 +124,7 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
 
   const saveAll = useCallback(() => {
     if (config) {
-      const dirInfo: Array<string> = [];
-      for (let i = 0; i < 3; i += 1) {
-        dirInfo.push(dirRefs[i].current!.getValue());
-      }
+      const dirInfo: Array<string> = dirRefs.map((el) => el.current!.getValue());
       const doEncrypt = encryptRef.current!.state.currToggled;
       dispatch(saveConfig({
         dirInfo,
