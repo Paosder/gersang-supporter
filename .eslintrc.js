@@ -52,6 +52,8 @@ module.exports = {
     "@typescript-eslint/indent": 0,
     "import/no-extraneous-dependencies": 0,
     "react-perf/jsx-no-new-object-as-prop": 0,
+    "no-multiple-empty-lines": 0,
+    "react/jsx-indent": 0,
     "max-len": "warn",
     "import/extensions": [
       "error",
