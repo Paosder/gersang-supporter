@@ -1,21 +1,12 @@
+import { ThunkAction } from 'redux-thunk';
+import { AnyAction } from 'redux';
+import { ConfigState } from '../config/types';
+import { EnumLoginState, LoginState } from './types';
+
 export const SET_STATUS = '@MAIN/SET_STATUS' as const;
 
 export const REINIT_ACTIVE_CLIENTS = '@MAIN/REINIT_ACTIVE_CLIENTS' as const;
 
-export enum EnumLoginState {
-  AUTH_FAILED,
-  LOGOUT,
-  WAIT_OTP,
-  SEND_AUTH,
-  SEND_OTP,
-  LOGIN,
-}
-
-export interface LoginState {
-  clients: Array<{
-    status: EnumLoginState;
-  }>
-}
 
 export const setStatus = (index: number, status: EnumLoginState) => ({
   type: SET_STATUS,
@@ -31,6 +22,21 @@ export const reInitActiveClients = (clientLength: number) => ({
     clientLength,
   },
 });
+
+export const executeDirect = (index: number): ThunkAction<Promise<void>, {
+    config: ConfigState,
+    login: LoginState,
+  }, {}, AnyAction> => async (dispatch, getState) => {
+  // dispatch({
+  //   type: SET_USERINFO,
+  //   payload: {
+  //     username: encrypt(username),
+  //     password: encrypt(password),
+  //     index,
+  //   },
+  // });
+  // dispatch(saveConfig({ doEncrypt: getState().config.encrypted === 'true' }, true));
+};
 
 export type MainActions = ReturnType<typeof setStatus> |
   ReturnType<typeof reInitActiveClients>;

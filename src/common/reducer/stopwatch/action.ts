@@ -1,4 +1,5 @@
 import { ThunkAction } from 'redux-thunk';
+import { StopWatchState, StopWatchStatus } from './types';
 
 export const SET_STATUS = '@STOPWATCH/SET_STATUS' as const;
 
@@ -6,7 +7,6 @@ export const SET_BASE_TIME = '@STOPWATCH/SET_BASE_TIME' as const;
 
 export const INCREASE_ELAPSED_TIME = '@STOPWATCH/INCREASE_ELAPSED_TIME' as const;
 
-type StopWatchStatus = 'START' | 'PAUSE' | 'STOP';
 
 export const setStatus = (status: StopWatchStatus) => ({
   type: SET_STATUS,
@@ -44,8 +44,3 @@ export type StopWatchActions = ReturnType<typeof setBaseTime>
   | ReturnType<typeof increaseElapsedTime>
   | ReturnType<typeof setStatus>;
 
-export interface StopWatchState {
-  elapsedTime: number;
-  baseTime: number;
-  status: StopWatchStatus;
-}

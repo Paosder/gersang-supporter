@@ -15,6 +15,7 @@ import { ipcRenderer, remote } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
 import { GlobalState } from '@common/reducer';
 import { saveConfig } from '@common/reducer/config/action';
+import { reqToggleBrowserOpen, reqOpenClientGenerator } from '@common/ipc/req';
 
 const ConfigLayout = styled.div`
   display: flex;
@@ -68,21 +69,6 @@ interface DirectoryInfo {
   index: number;
   path: string;
 }
-
-interface ConfigData {
-  username: string;
-  password: string;
-  path: string;
-  alwaysSave: boolean;
-}
-
-const openClientGenerator = () => {
-  ipcRenderer.send('open-client-generator', '');
-};
-
-const toggleBrowserOpen = () => {
-  ipcRenderer.send('toggle-browser');
-};
 
 const Configuration: React.FC<ThemeProps> = ({ theme }) => {
   const encryptRef = useRef<Toggle>(null);
@@ -211,7 +197,7 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
         </Flyout>
         <Toggle label="OTP 입력 시 기본 별표 처리" defaultToggled />
         <Flyout>
-          <Button onClick={toggleBrowserOpen}>
+          <Button onClick={reqToggleBrowserOpen}>
             브라우저 열기/닫기 (임시)
           </Button>
           <FlyoutContent
@@ -226,7 +212,7 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
         <Separator />
         <SectionTitle>경로</SectionTitle>
         {paths}
-        <Button onClick={openClientGenerator}>
+        <Button onClick={reqOpenClientGenerator}>
             클라이언트 생성
         </Button>
         <Separator />

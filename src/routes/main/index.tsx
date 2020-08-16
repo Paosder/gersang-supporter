@@ -2,10 +2,14 @@ import { ipcRenderer } from 'electron';
 import {
   Route, Switch, RouteComponentProps, Link,
 } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import IconButton from 'react-uwp/IconButton';
 import { ThemeProps } from 'react-uwp';
+import { useSelector } from 'react-redux';
+import { GlobalState } from '@common/reducer';
+import { EnumLoginState } from '@common/reducer/login/types';
+import { reqGameExecute, reqOpenConfig } from '@common/ipc/req';
 import LoginForm from './login';
 import Clock from './clock';
 
@@ -39,13 +43,33 @@ const Features = styled.div`
   max-height: 195px;
   overflow-y: auto;
 `;
+interface ExecuteAccountArgs {
+  index: number;
+}
 
+const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
+  const configClients = useSelector((state: GlobalState) => state.config.clients);
+  const loginClients = useSelector((state: GlobalState) => state.login.clients);
 
-const openConfig = () => {
-  ipcRenderer.send('open-configuration', '');
-};
+  useEffect(() => {
+    const executeAccount = (e: Electron.IpcRendererEvent, args: ExecuteAccountArgs) => {
+      console.log(args);
+      if (loginClients[args.index].status === EnumLoginState.LOGIN) {
+        // already login.
+        reqGameExecute(args.index, configClients[args.index].path,
+          configClients[args.index].alwaysRestore === 'true',
+          configClients[0].path);
+      }
+    };
 
-const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
+    ipcRenderer.on('execute-client', executeAccount);
+
+    return () => {
+      ipcRenderer.off('execute-client', executeAccount);
+    };
+  }, [configClients, loginClients]);
+
+  return (
   <MainLayout>
     <LeftMenu>
       <Features>
@@ -70,7 +94,7 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
           </IconButton> */}
       </Features>
       <IconButton
-        onClick={openConfig}
+        onClick={reqOpenConfig}
       >
         SettingsLegacy
       </IconButton>
@@ -80,5 +104,6 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
       <Route path={`${match.path}/clock`} component={Clock} />
     </Switch>
   </MainLayout>
-);
+  );
+};
 export default Main;

@@ -202,11 +202,14 @@ const main = () => {
       label: '1번 계정으로 시작',
       type: 'normal',
       click: () => {
-        dialog.showMessageBox(mainWindow, {
-          title: '일해라 핫산',
-          type: 'warning',
-          message: '기능 준비중입니다 ㅠㅠ',
+        mainWindow.webContents.send('execute-client', {
+          index: 0,
         });
+        // dialog.showMessageBox(mainWindow, {
+        //   title: '일해라 핫산',
+        //   type: 'warning',
+        //   message: '기능 준비중입니다 ㅠㅠ',
+        // });
       },
     },
     {
@@ -471,8 +474,8 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
 });
 
 interface LogoutArgs {
-  index: number;
-  forced?: boolean;
+  forced: boolean;
+  index?: number;
 }
 
 ipcMain.on('request-logout', (event, args: LogoutArgs) => {
@@ -483,6 +486,7 @@ ipcMain.on('request-logout', (event, args: LogoutArgs) => {
       reason: 'cancel-otp',
     });
     dialog.showErrorBox('OTP 취소!', 'OTP 인증을 취소하였습니다.');
+    logoutUser(currentIndex);
   } else {
     mainWindow.webContents.send('response-logout', {
       error: false,

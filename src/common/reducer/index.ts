@@ -3,10 +3,10 @@ import login from './login';
 import config from './config';
 import timer from './timer';
 import stopwatch from './stopwatch';
-import { ConfigState } from './config/action';
-import { LoginState } from './login/action';
-import { TimerState } from './timer/action';
-import { StopWatchState } from './stopwatch/action';
+import { ConfigState } from './config/types';
+import { LoginState } from './login/types';
+import { TimerState } from './timer/types';
+import { StopWatchState } from './stopwatch/types';
 
 
 export interface GlobalState {

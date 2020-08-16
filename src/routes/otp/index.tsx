@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { remote, ipcRenderer } from 'electron';
+import { remote } from 'electron';
 import { ThemeProps } from 'react-uwp';
 import PasswordBox from 'react-uwp/PasswordBox';
 import styled from 'styled-components';
+import { reqLogout, reqOtpAuthKeys } from '@common/ipc/req';
 
 const OTPLayout = styled.div`
   display: flex;
@@ -21,7 +22,7 @@ const OTPWindow: React.FC<ThemeProps> = () => {
     }
     remote.getCurrentWindow().on('close', () => {
       if (!otpEntered) {
-        ipcRenderer.send('request-logout', true);
+        reqLogout(undefined, true);
       }
     });
   }, [otpEntered]);
@@ -32,7 +33,7 @@ const OTPWindow: React.FC<ThemeProps> = () => {
       e.stopPropagation();
       otpEntered = true;
       const otpData = otpRef.current!.getValue();
-      ipcRenderer.send('request-otp', otpData);
+      reqOtpAuthKeys(otpData);
       remote.getCurrentWindow().close();
     }
   };
