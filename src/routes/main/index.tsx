@@ -9,7 +9,7 @@ import { ThemeProps } from 'react-uwp';
 import { useSelector, useDispatch } from 'react-redux';
 import { GlobalState } from '@common/reducer';
 import { EnumLoginState } from '@common/reducer/login/types';
-import { reqGameExecute, reqOpenConfig } from '@common/ipc/req';
+import { reqGameExecute, reqOpenConfig, buildTrayContextMenu } from '@common/ipc/req';
 import { executeDirect } from '@common/reducer/login/action';
 import LoginForm from './login';
 import Clock from './clock';
@@ -52,15 +52,17 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // rebuild tray context menu.
+    const trayMenuInfo = configClients.map((el, i) => ({
+      title: el.title,
+      index: i,
+    }));
+    buildTrayContextMenu({
+      clients: trayMenuInfo,
+    });
+
     const executeAccount = (e: Electron.IpcRendererEvent, args: ExecuteAccountArgs) => {
-      console.log(args);
       dispatch(executeDirect(args.index));
-      // if (loginClients[args.index].status === EnumLoginState.LOGIN) {
-      //   // already login.
-      //   reqGameExecute(args.index, configClients[args.index].path,
-      //     configClients[args.index].alwaysRestore === 'true',
-      //     configClients[0].path);
-      // }
     };
 
     ipcRenderer.on('execute-client', executeAccount);
@@ -68,7 +70,7 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
     return () => {
       ipcRenderer.off('execute-client', executeAccount);
     };
-  }, [configClients, dispatch, loginClients]);
+  }, [configClients, configClients.length, dispatch, loginClients.length]);
 
   return (
   <MainLayout>

@@ -103,15 +103,16 @@ export const setUserInfo = (username: string,
   password: string, index: number): ThunkAction<Promise<void>, {
     config: ConfigState
   }, {}, AnyAction> => async (dispatch, getState) => {
+  const doEncrypt = getState().config.encrypted === 'true';
   dispatch({
     type: SET_USERINFO,
     payload: {
-      username: encrypt(username),
-      password: encrypt(password),
+      username: doEncrypt ? encrypt(username) : username,
+      password: doEncrypt ? encrypt(password) : password,
       index,
     },
   });
-  dispatch(saveConfig({ doEncrypt: getState().config.encrypted === 'true' }, true));
+  dispatch(saveConfig({ doEncrypt }, true));
 };
 
 export type ConfigActions = {

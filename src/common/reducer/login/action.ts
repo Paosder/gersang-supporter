@@ -1,6 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
-import { reqGameExecute, reqLogin } from '@common/ipc/req';
+import { reqGameExecute, reqLogin, registerCallback } from '@common/ipc/req';
 import { ConfigState } from '../config/types';
 import { EnumLoginState, LoginState } from './types';
 
@@ -35,15 +35,32 @@ export const executeDirect = (index: number): ThunkAction<Promise<void>, {
 
   switch (status) {
     case EnumLoginState.LOGIN: {
+      // already logged in.
       const { path, alwaysRestore } = configClients[index];
       const { path: restorePath } = configClients[0];
       reqGameExecute(index, path, alwaysRestore === 'true', restorePath);
       return;
     }
     case EnumLoginState.LOGOUT: {
+      // not login state (first phase).
       const { username, password } = configClients[index];
-      reqLogin(index, username, password, (res: any) => {
-        console.log(res);
+      reqLogin(index, username, password, (res: { status: boolean, reason: string}) => {
+        if (res.status) {
+          // true. go next stage.
+          setTimeout(() => {
+            dispatch(executeDirect(index));
+          }, 50);
+        } else if (res.reason === 'otp-required') {
+          // otp required. attach callback again.
+          registerCallback('request-login', (nextRes: { status: boolean, reason: string }) => {
+            if (nextRes.status) {
+              // success to login. go next stage.
+              setTimeout(() => {
+                dispatch(executeDirect(index));
+              });
+            }
+          });
+        }
       });
     }
     default:
@@ -51,7 +68,7 @@ export const executeDirect = (index: number): ThunkAction<Promise<void>, {
       // wrong?
   }
   // dispatch again to wait next response.
-  dispatch(executeDirect(index));
+  // dispatch(executeDirect(index));
   // dispatch({
   //   type: SET_USERINFO,
   //   payload: {

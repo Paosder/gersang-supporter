@@ -179,8 +179,10 @@ const closeIE = (index?: number) => {
         el = undefined;
       }
     });
-  } else if (IE[index] && IE[index].Application) {
-    IE[index].Application.Quit();
+  } else if (IE[index]) {
+    if (IE[index].Application) {
+      IE[index].Application.Quit();
+    }
     IE[index] = undefined;
   }
 };
@@ -197,68 +199,10 @@ const logoutUser = (index: number) => {
 
 const main = () => {
   tray = new Tray(trayImg);
-  const contextmenu = Menu.buildFromTemplate([
-    {
-      label: '1번 계정으로 시작',
-      type: 'normal',
-      click: () => {
-        mainWindow.webContents.send('execute-client', {
-          index: 0,
-        });
-        // dialog.showMessageBox(mainWindow, {
-        //   title: '일해라 핫산',
-        //   type: 'warning',
-        //   message: '기능 준비중입니다 ㅠㅠ',
-        // });
-      },
-    },
-    {
-      label: '2번 계정으로 시작',
-      type: 'normal',
-      click: () => {
-        dialog.showMessageBox(mainWindow, {
-          title: '일해라 핫산',
-          type: 'warning',
-          message: '기능 준비중입니다 ㅠㅠ',
-        });
-      },
-    },
-    {
-      label: '3번 계정으로 시작',
-      type: 'normal',
-      click: () => {
-        dialog.showMessageBox(mainWindow, {
-          title: '일해라 핫산',
-          type: 'warning',
-          message: '기능 준비중입니다 ㅠㅠ',
-        });
-      },
-    },
-    {
-      type: 'separator',
-    },
-    {
-      label: '환경 설정',
-      type: 'normal',
-      click: () => {
-        openConfigurationWindow();
-      },
-    },
-    {
-      label: '종료',
-      type: 'normal',
-      click: () => {
-        closeIE();
-        process.exit(0);
-        // app.quit();
-      },
-    },
-  ]);
   tray.on('click', () => {
     mainWindow.show();
   });
   tray.setToolTip('거상 서포터');
-  tray.setContextMenu(contextmenu);
 
   mainWindow = new BrowserWindow({
     width: 425,
@@ -324,6 +268,48 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
 
 // ///////////////////////////////////////////////////////
 // IPC Communications ----------------------------------
+
+interface TrayMenuInfo {
+  clients: Array<{
+    index: number;
+    title?: string;
+  }>;
+}
+
+ipcMain.on('build-traymenu', (event, args: TrayMenuInfo) => {
+  const clients = args.clients.map((el) => ({
+    label: `${el.title || `${el.index + 1}번`}(으)로 시작`,
+    type: 'normal',
+    click: () => {
+      mainWindow.webContents.send('execute-client', {
+        index: el.index,
+      });
+    },
+  }));
+  const contextmenu = Menu.buildFromTemplate([
+    ...clients,
+    {
+      type: 'separator',
+    },
+    {
+      label: '환경 설정',
+      type: 'normal',
+      click: () => {
+        openConfigurationWindow();
+      },
+    },
+    {
+      label: '종료',
+      type: 'normal',
+      click: () => {
+        closeIE();
+        process.exit(0);
+        // app.quit();
+      },
+    },
+  ]);
+  tray.setContextMenu(contextmenu);
+});
 
 ipcMain.on('request-login', async (event, arg) => {
   const { index, id, password } = arg;
@@ -452,11 +438,11 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     });
     dialog.showErrorBox('OTP 오류!', '인증 번호가 맞지 않습니다!');
     mainWindow.setProgressBar(0);
-    closeIE(index);
+    closeIE(currentIndex);
     return;
   }
-  for (let i = 0; i < 2; i += 1) {
-    // cross check twice (occationally fails at first time)
+  for (let i = 0; i < 3; i += 1) {
+    // cross check (occationally fails at first time)
     IE[currentIndex].navigate('https://www.gersang.co.kr/main.gs');
     await waitBusy(currentIndex); // eslint-disable-line
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
@@ -465,7 +451,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
         status: true,
         reason: 'success-with-otp',
       });
-      mainWindow.setProgressBar(100);
+      mainWindow.setProgressBar(0);
       return;
     }
   }
@@ -476,7 +462,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     status: false,
     reason: 'fail-with-otp',
   });
-  closeIE(index);
+  closeIE(currentIndex);
 });
 
 interface LogoutArgs {
@@ -493,14 +479,14 @@ ipcMain.on('request-logout', (event, args: LogoutArgs) => {
     });
     dialog.showErrorBox('OTP 취소!', 'OTP 인증을 취소하였습니다.');
     logoutUser(currentIndex);
-    closeIE(index);
+    closeIE(currentIndex);
   } else {
     mainWindow.webContents.send('request-logout', {
       error: false,
       reason: 'success-logout',
     });
     logoutUser(args.index);
-    closeIE(index);
+    closeIE(args.index);
   }
 });
 

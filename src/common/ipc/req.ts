@@ -1,10 +1,10 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type ResponseCallback = (args: any) => void;
 
-const registerCallback = (channel: string, callback?: ResponseCallback) => {
+export const registerCallback = (channel: string, callback?: ResponseCallback) => {
   if (callback) {
-    const gcCallback = (args: any) => {
+    const gcCallback = (event: IpcRendererEvent, args: any) => {
       ipcRenderer.off(channel, gcCallback);
       callback(args);
     };
@@ -58,4 +58,14 @@ export const reqToggleBrowserOpen = () => {
 
 export const reqOpenConfig = () => {
   ipcRenderer.send('open-configuration', '');
+};
+
+interface TrayMenuInfo {
+  clients: Array<{
+    index: number;
+    title?: string;
+  }>;
+}
+export const buildTrayContextMenu = (menuInfo: TrayMenuInfo) => {
+  ipcRenderer.send('build-traymenu', menuInfo);
 };
