@@ -1,5 +1,5 @@
 import { Reducer } from 'redux';
-import { NotificationIcon } from '@common/icons';
+// import { NotificationIcon } from '@common/icons';
 import {
   StopWatchActions, SET_BASE_TIME,
   INCREASE_ELAPSED_TIME, SET_STATUS, StopWatchState,

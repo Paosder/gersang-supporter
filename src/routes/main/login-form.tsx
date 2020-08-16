@@ -38,12 +38,12 @@ const CommandButtons = styled.div`
   }
 `;
 
-const WarnTitle = styled.span`
-  position: absolute;
-  top: 0.5rem;
-  color: red;
-  user-select: none;
-`;
+// const WarnTitle = styled.span`
+//   position: absolute;
+//   top: 0.5rem;
+//   color: red;
+//   user-select: none;
+// `;
 
 const PathInfo = styled.span`
   position: absolute;

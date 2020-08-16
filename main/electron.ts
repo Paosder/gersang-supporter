@@ -139,14 +139,17 @@ const restoreFiles = [
 // ///////////////////////////////////////////////////////
 // Main ----------------------------------
 
-const waitBusy = (limit: number = 10000) => new Promise((resolve, reject) => {
+const waitBusy = (clientIndex: number, limit: number = 10000) => new Promise((resolve, reject) => {
   let elapsed = 0;
   const p = () => {
     const title = '웹 페이지 메시지\0'; // null-terminated string
 
     const lpszWindow = Buffer.from(title, 'ucs2');
-    const hWnd = user32.FindWindowExW(null, null, null, lpszWindow);
-    if (hWnd && !hWnd.isNull()) {
+    const hWnd = user32.FindWindowExW(0, 0, null, lpszWindow);
+    if ((typeof hWnd === 'number' && hWnd > 0)
+      || (typeof hWnd === 'bigint' && hWnd > 0)
+      || (typeof hWnd === 'string' && hWnd.length > 0)
+    ) {
       // found alert window. This situation would appears when something went wrong.
       user32.SendMessageW(hWnd, 0x10, 0, 0);
       reject();
@@ -155,8 +158,8 @@ const waitBusy = (limit: number = 10000) => new Promise((resolve, reject) => {
       reject();
       return;
     }
-    if (IE && IE.Application) {
-      if ((!IE.Busy) || (IE.Busy.valueOf() !== false)) {
+    if (IE[clientIndex] && IE[clientIndex].Application) {
+      if (IE[clientIndex].Busy) {
         elapsed += 100;
         setTimeout(p, 100);
       } else {
@@ -321,7 +324,6 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
 
 ipcMain.on('request-login', async (event, arg) => {
   const { index, id, password } = arg;
-  console.log(index, id, password);
   closeIE(index);
   mainWindow.setProgressBar(0.1);
   IE[index] = new ActiveXObject('InternetExplorer.Application');
@@ -330,16 +332,20 @@ ipcMain.on('request-login', async (event, arg) => {
   currentIndex = index;
   try {
     IE[index].navigate('http://www.gersang.co.kr/main.gs');
-    await waitBusy();
-    return;
-
+    await waitBusy(index);
     logoutUser(index);
-    await waitBusy();
+    await waitBusy(index);
     IE[index].navigate('http://www.gersang.co.kr/pub/logi/login/login.gs?returnUrl=www.gersang.co.kr%2Fmain.gs');
-    await waitBusy();
+    await waitBusy(index);
   } catch (e) {
     dialog.showErrorBox('IE 오류!',
       '인터넷이 연결되어있지 않을 수도 있어요!');
+    event.reply('response-logout', {
+      error: true,
+      reason: 'login-failed',
+    });
+    mainWindow.setProgressBar(0);
+    return;
   }
   mainWindow.setProgressBar(0.2);
 
@@ -367,7 +373,7 @@ ipcMain.on('request-login', async (event, arg) => {
   document.querySelector('[src="/image/main/bt_login.gif"]').click();
 
   try {
-    await waitBusy();
+    await waitBusy(index);
   } catch {
     IE[index].Application.Quit();
     event.reply('response-logout', {
@@ -406,7 +412,7 @@ ipcMain.on('request-login', async (event, arg) => {
     mainWindow.setProgressBar(0.75);
   } else {
     IE[index].navigate('http://www.gersang.co.kr/main.gs');
-    await waitBusy();
+    await waitBusy(index);
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
       event.reply('response-login', {
@@ -431,7 +437,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   otp.innerText = otpData;
   document.querySelector('[src="/image/board/bt_le_ok.gif"]').click();
   try {
-    await waitBusy();
+    await waitBusy(currentIndex);
   } catch {
     mainWindow.webContents.send('response-logout', {
       error: true,
@@ -444,7 +450,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   for (let i = 0; i < 2; i += 1) {
     // cross check twice (occationally fails at first time)
     IE[currentIndex].navigate('https://www.gersang.co.kr/main.gs');
-    await waitBusy(); // eslint-disable-line
+    await waitBusy(currentIndex); // eslint-disable-line
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
       mainWindow.webContents.send('response-login', {
@@ -471,7 +477,7 @@ interface LogoutArgs {
 
 ipcMain.on('request-logout', (event, args: LogoutArgs) => {
   mainWindow.setProgressBar(0);
-  if (forced) {
+  if (args.forced) {
     mainWindow.webContents.send('response-logout', {
       error: true,
       reason: 'cancel-otp',
@@ -523,7 +529,7 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
             path.join(cliArg.path, file));
         });
       }
-      const document = IE[index].Document;
+      const document = IE[cliArg.index].Document;
       if (document) {
         document.parentWindow.execScript('gameStart(1)');
       } else {
