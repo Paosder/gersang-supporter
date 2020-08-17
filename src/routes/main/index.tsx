@@ -2,10 +2,15 @@ import { ipcRenderer } from 'electron';
 import {
   Route, Switch, RouteComponentProps, Link,
 } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import IconButton from 'react-uwp/IconButton';
 import { ThemeProps } from 'react-uwp';
+import { useSelector, useDispatch } from 'react-redux';
+import { GlobalState } from '@common/reducer';
+import { EnumLoginState } from '@common/reducer/login/types';
+import { reqGameExecute, reqOpenConfig, buildTrayContextMenu } from '@common/ipc/req';
+import { executeDirect } from '@common/reducer/login/action';
 import LoginForm from './login';
 import Clock from './clock';
 
@@ -14,7 +19,6 @@ const MainLayout = styled.div`
   width: 100%;
   height: 100%;
   background-color: #eeeeee;
-  /* justify-content: space-between; */
 
   > * {
     flex-grow: 1;
@@ -22,7 +26,6 @@ const MainLayout = styled.div`
 
   > :first-child {
     flex: none;
-    /* background-color: rgb(0, 120, 215); */
   }
 `;
 
@@ -39,13 +42,37 @@ const Features = styled.div`
   max-height: 195px;
   overflow-y: auto;
 `;
+interface ExecuteAccountArgs {
+  index: number;
+}
 
+const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
+  const configClients = useSelector((state: GlobalState) => state.config.clients);
+  const loginClients = useSelector((state: GlobalState) => state.login.clients);
+  const dispatch = useDispatch();
 
-const openConfig = () => {
-  ipcRenderer.send('open-configuration', '');
-};
+  useEffect(() => {
+    // rebuild tray context menu.
+    const trayMenuInfo = configClients.map((el, i) => ({
+      title: el.title,
+      index: i,
+    }));
+    buildTrayContextMenu({
+      clients: trayMenuInfo,
+    });
 
-const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
+    const executeAccount = (e: Electron.IpcRendererEvent, args: ExecuteAccountArgs) => {
+      dispatch(executeDirect(args.index));
+    };
+
+    ipcRenderer.on('execute-client', executeAccount);
+
+    return () => {
+      ipcRenderer.off('execute-client', executeAccount);
+    };
+  }, [configClients, configClients.length, dispatch, loginClients.length]);
+
+  return (
   <MainLayout>
     <LeftMenu>
       <Features>
@@ -70,7 +97,7 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
           </IconButton> */}
       </Features>
       <IconButton
-        onClick={openConfig}
+        onClick={reqOpenConfig}
       >
         SettingsLegacy
       </IconButton>
@@ -80,5 +107,6 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => (
       <Route path={`${match.path}/clock`} component={Clock} />
     </Switch>
   </MainLayout>
-);
+  );
+};
 export default Main;

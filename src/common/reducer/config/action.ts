@@ -1,23 +1,11 @@
 import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { baseUrl, encrypt } from '@common/constant';
-import { remote, ipcRenderer } from 'electron';
+import { remote } from 'electron';
 import fs from 'fs';
 import path from 'path';
-
-export interface ConfigData {
-  username: string;
-  password: string;
-  path: string;
-  alwaysSave: string;
-  alwaysRestore: string;
-  title?: string;
-}
-
-export interface ConfigState {
-  clients: Array<ConfigData>;
-  encrypted: string;
-}
+import { reqChangeConfig } from '@common/ipc/req';
+import { ConfigState } from './types';
 
 export const SET_AUTOSAVE = '@CONFIG/SET_AUTO_SAVE' as const;
 
@@ -101,7 +89,7 @@ export const saveConfig = ({
         remote.dialog.showErrorBox('설정 파일 저장 오류!',
           '알 수 없는 이유로 설정 파일을 저장할 수 없었어요! T.T');
       } else {
-        ipcRenderer.send('change-config', silent);
+        reqChangeConfig(silent);
         dispatch(configReload());
       }
     });
@@ -115,15 +103,16 @@ export const setUserInfo = (username: string,
   password: string, index: number): ThunkAction<Promise<void>, {
     config: ConfigState
   }, {}, AnyAction> => async (dispatch, getState) => {
+  const doEncrypt = getState().config.encrypted === 'true';
   dispatch({
     type: SET_USERINFO,
     payload: {
-      username: encrypt(username),
-      password: encrypt(password),
+      username: doEncrypt ? encrypt(username) : username,
+      password: doEncrypt ? encrypt(password) : password,
       index,
     },
   });
-  dispatch(saveConfig({ doEncrypt: getState().config.encrypted === 'true' }, true));
+  dispatch(saveConfig({ doEncrypt }, true));
 };
 
 export type ConfigActions = {

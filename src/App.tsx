@@ -9,7 +9,7 @@ import { NotificationIcon } from '@common/icons';
 import { Provider } from 'react-redux';
 import reducer from '@common/reducer';
 import {
-  Main, Configuration, OTP, ClientGenerator,
+  Main, Configuration, OTP, ClientGenerator, Loading,
 } from './routes';
 import generateStore from './store';
 import './App.css';
@@ -34,7 +34,7 @@ const App: React.FC = () => (
         theme={getTheme({
           themeName: 'light', // set custom theme
           // accent: '#0078D7', // set accent color
-          // desktopBackgroundImage: backgroundImg,
+          desktopBackgroundImage: 'transparent',
           useFluentDesign: true,
         })}
       >
@@ -42,6 +42,7 @@ const App: React.FC = () => (
           <Route path="/main" component={Main} />
           <Route path="/configuration" component={Configuration} />
           <Route path="/otp" component={OTP} />
+          <Route path="/loading" component={Loading} />
           <Route path="/client-generator" component={ClientGenerator} />
         </HashRouter>
       </UWPThemeProvider>

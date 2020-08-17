@@ -16,7 +16,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   setAutoSave, setAutoRestore, setUserInfo,
 } from '@common/reducer/config/action';
-import { setStatus, EnumLoginState as LoginState } from '@common/reducer/login/action';
+import { setStatus } from '@common/reducer/login/action';
+import { EnumLoginState as LoginState } from '@common/reducer/login/types';
+import { reqLogin, reqGameExecute, reqLogout } from '@common/ipc/req';
 
 const ClientLayout = styled.div`
   padding-top: 2rem;
@@ -95,10 +97,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ index }) => {
   const dispatch = useDispatch();
 
   const requestLogout = useCallback(() => {
-    ipcRenderer.send('request-logout', {
-      index,
-      forced: false,
-    });
+    reqLogout(index, false);
   }, [index]);
 
   const requestLogin = useCallback(() => {
@@ -116,11 +115,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ index }) => {
         '아이디 혹은 비밀번호가 공란이에요!');
       return;
     }
-    ipcRenderer.send('request-login', {
-      id,
-      password,
-      index,
-    });
+    reqLogin(index, id, password);
     dispatch(setStatus(index, LoginState.SEND_AUTH));
     // setLoginState(LoginState.SEND_AUTH);
   }, [dispatch, index, loginState, pending, requestLogout]);
@@ -128,12 +123,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ index }) => {
 
 
   const requestGameExecute = () => {
-    ipcRenderer.send('execute-game', {
-      index,
-      path: config.path,
-      restorePath,
-      restore: config.alwaysRestore === 'true',
-    }); // set client number
+    reqGameExecute(index, config.path,
+      config.alwaysRestore === 'true',
+      restorePath);
   };
 
   const onKeyPress = (e: React.KeyboardEvent) => {
@@ -192,11 +184,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ index }) => {
       }
       dispatch(setStatus(index, LoginState.LOGOUT));
     };
-    ipcRenderer.on('response-login', responseLoginCallback);
-    ipcRenderer.on('response-logout', responseLogoutCallback);
+    ipcRenderer.on('request-login', responseLoginCallback);
+    ipcRenderer.on('request-logout', responseLogoutCallback);
     return () => {
-      ipcRenderer.off('response-login', responseLoginCallback);
-      ipcRenderer.off('response-logout', responseLogoutCallback);
+      ipcRenderer.off('request-login', responseLoginCallback);
+      ipcRenderer.off('request-logout', responseLogoutCallback);
     };
   }, [config.alwaysSave, dispatch, index, idRef, pwRef]);
 

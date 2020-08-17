@@ -1,4 +1,5 @@
 import { ThunkAction } from 'redux-thunk';
+import { TimerState, TimerStatus } from './types';
 
 export const SET_STATUS = '@TIMER/SET_STATUS' as const;
 
@@ -6,7 +7,6 @@ export const SET_LEFT_TIME = '@TIMER/SET_LEFT_TIME' as const;
 
 export const DECREASE_LEFT_TIME = '@TIMER/DECREASE_LEFT_TIME' as const;
 
-type TimerStatus = 'START' | 'PAUSE' | 'STOP';
 
 export const setStatus = (status: TimerStatus) => ({
   type: SET_STATUS,
@@ -44,8 +44,3 @@ export type TimerActions = ReturnType<typeof setLeftTime>
   | ReturnType<typeof decreaseLeftTime>
   | ReturnType<typeof setStatus>;
 
-export interface TimerState {
-  leftTime: number;
-  notification: boolean;
-  status: TimerStatus;
-}

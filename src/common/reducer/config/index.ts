@@ -3,8 +3,9 @@ import path from 'path';
 import { Reducer } from 'redux';
 import { baseUrl } from '@common/constant';
 import {
-  ConfigState, ConfigActions, SET_AUTOSAVE, SET_USERINFO, CONFIG_RELOAD, SET_AUTORESTORE,
+  ConfigActions, SET_AUTOSAVE, SET_USERINFO, CONFIG_RELOAD, SET_AUTORESTORE,
 } from './action';
+import { ConfigState } from './types';
 
 const initState = (): ConfigState => {
   try {

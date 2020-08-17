@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  app, BrowserWindow, ipcMain, Menu, Tray, dialog,
+  app, BrowserWindow, ipcMain, Menu, Tray, dialog, screen,
 } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
@@ -77,6 +77,8 @@ let configWindow: Electron.BrowserWindow;
 let ClientGeneratorWindow: Electron.BrowserWindow;
 
 let otpWindow: Electron.BrowserWindow;
+
+let loadingWindow: Electron.BrowserWindow;
 
 const IE: any[] = []; // IE object for each account.
 
@@ -179,8 +181,10 @@ const closeIE = (index?: number) => {
         el = undefined;
       }
     });
-  } else if (IE[index] && IE[index].Application) {
-    IE[index].Application.Quit();
+  } else if (IE[index]) {
+    if (IE[index].Application) {
+      IE[index].Application.Quit();
+    }
     IE[index] = undefined;
   }
 };
@@ -197,65 +201,10 @@ const logoutUser = (index: number) => {
 
 const main = () => {
   tray = new Tray(trayImg);
-  const contextmenu = Menu.buildFromTemplate([
-    {
-      label: '1번 계정으로 시작',
-      type: 'normal',
-      click: () => {
-        dialog.showMessageBox(mainWindow, {
-          title: '일해라 핫산',
-          type: 'warning',
-          message: '기능 준비중입니다 ㅠㅠ',
-        });
-      },
-    },
-    {
-      label: '2번 계정으로 시작',
-      type: 'normal',
-      click: () => {
-        dialog.showMessageBox(mainWindow, {
-          title: '일해라 핫산',
-          type: 'warning',
-          message: '기능 준비중입니다 ㅠㅠ',
-        });
-      },
-    },
-    {
-      label: '3번 계정으로 시작',
-      type: 'normal',
-      click: () => {
-        dialog.showMessageBox(mainWindow, {
-          title: '일해라 핫산',
-          type: 'warning',
-          message: '기능 준비중입니다 ㅠㅠ',
-        });
-      },
-    },
-    {
-      type: 'separator',
-    },
-    {
-      label: '환경 설정',
-      type: 'normal',
-      click: () => {
-        openConfigurationWindow();
-      },
-    },
-    {
-      label: '종료',
-      type: 'normal',
-      click: () => {
-        closeIE();
-        process.exit(0);
-        // app.quit();
-      },
-    },
-  ]);
   tray.on('click', () => {
     mainWindow.show();
   });
   tray.setToolTip('거상 서포터');
-  tray.setContextMenu(contextmenu);
 
   mainWindow = new BrowserWindow({
     width: 425,
@@ -322,6 +271,72 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
 // ///////////////////////////////////////////////////////
 // IPC Communications ----------------------------------
 
+interface TrayMenuInfo {
+  clients: Array<{
+    index: number;
+    title?: string;
+  }>;
+}
+
+ipcMain.on('build-traymenu', (event, args: TrayMenuInfo) => {
+  const clients = args.clients.map((el) => ({
+    label: `${el.title || `${el.index + 1}번`}(으)로 시작`,
+    type: 'normal',
+    click: () => {
+      const display = screen.getPrimaryDisplay();
+      const { width, height } = display.bounds;
+      loadingWindow = new BrowserWindow(
+        {
+          width: 200,
+          height: 200,
+          frame: false,
+          webPreferences: {
+            nodeIntegration: true,
+            devTools: process.env.NODE_ENV === 'development' || false,
+            backgroundThrottling: false,
+          },
+          y: height - 200,
+          x: width - 200,
+          transparent: true,
+          icon: trayImg,
+        },
+      );
+      loadingWindow.setIgnoreMouseEvents(true);
+      const loadingUrl = `${baseUrl}#/loading`;
+      loadingWindow.loadURL(loadingUrl);
+      loadingWindow.webContents.send('loading-screen', '');
+      setTimeout(() => {
+        mainWindow.webContents.send('execute-client', {
+          index: el.index,
+        });
+      }, 300);
+    },
+  }));
+  const contextmenu = Menu.buildFromTemplate([
+    ...clients,
+    {
+      type: 'separator',
+    },
+    {
+      label: '환경 설정',
+      type: 'normal',
+      click: () => {
+        openConfigurationWindow();
+      },
+    },
+    {
+      label: '종료',
+      type: 'normal',
+      click: () => {
+        closeIE();
+        process.exit(0);
+        // app.quit();
+      },
+    },
+  ]);
+  tray.setContextMenu(contextmenu);
+});
+
 ipcMain.on('request-login', async (event, arg) => {
   const { index, id, password } = arg;
   closeIE(index);
@@ -340,11 +355,12 @@ ipcMain.on('request-login', async (event, arg) => {
   } catch (e) {
     dialog.showErrorBox('IE 오류!',
       '인터넷이 연결되어있지 않을 수도 있어요!');
-    event.reply('response-logout', {
+    event.reply('request-logout', {
       error: true,
       reason: 'login-failed',
     });
     mainWindow.setProgressBar(0);
+    closeIE(index);
     return;
   }
   mainWindow.setProgressBar(0.2);
@@ -361,11 +377,12 @@ ipcMain.on('request-login', async (event, arg) => {
       `로그인 중 알 수 없는 문제가 발생했습니다.
 홈페이지가 정상적이지 않을 수도 있습니다.
 해당 증상이 반복될 경우 https://github.com/Paosder/gersang-supporter/issues 으로 문의주시면 감사하겠습니다.`);
-    event.reply('response-logout', {
+    event.reply('request-logout', {
       error: true,
       reason: 'login-failed',
     });
     mainWindow.setProgressBar(0);
+    closeIE(index);
     return;
   }
 
@@ -376,12 +393,13 @@ ipcMain.on('request-login', async (event, arg) => {
     await waitBusy(index);
   } catch {
     IE[index].Application.Quit();
-    event.reply('response-logout', {
+    event.reply('request-logout', {
       error: true,
       reason: 'login-failed',
     });
     dialog.showErrorBox('계정 오류!', '아이디 혹은 비밀번호가 틀린가봐요 T.T');
     mainWindow.setProgressBar(0);
+    closeIE(index);
     return;
   }
 
@@ -389,7 +407,7 @@ ipcMain.on('request-login', async (event, arg) => {
 
   if (otp) {
     // remoteAlert();
-    event.reply('response-login', {
+    event.reply('request-login', {
       status: false,
       reason: 'otp-required',
     });
@@ -415,16 +433,17 @@ ipcMain.on('request-login', async (event, arg) => {
     await waitBusy(index);
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
-      event.reply('response-login', {
+      event.reply('request-login', {
         status: true,
         reason: 'success-without-otp',
       });
       mainWindow.setProgressBar(0);
     } else {
-      mainWindow.webContents.send('response-logout', {
+      mainWindow.webContents.send('request-logout', {
         error: true,
         reason: 'login-error',
       });
+      closeIE(index);
     }
   }
 });
@@ -439,21 +458,22 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   try {
     await waitBusy(currentIndex);
   } catch {
-    mainWindow.webContents.send('response-logout', {
+    mainWindow.webContents.send('request-logout', {
       error: true,
       reason: 'wrong-number-otp',
     });
     dialog.showErrorBox('OTP 오류!', '인증 번호가 맞지 않습니다!');
     mainWindow.setProgressBar(0);
+    closeIE(currentIndex);
     return;
   }
-  for (let i = 0; i < 2; i += 1) {
-    // cross check twice (occationally fails at first time)
+  for (let i = 0; i < 3; i += 1) {
+    // cross check (occationally fails at first time)
     IE[currentIndex].navigate('https://www.gersang.co.kr/main.gs');
     await waitBusy(currentIndex); // eslint-disable-line
     const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
     if (logout) {
-      mainWindow.webContents.send('response-login', {
+      mainWindow.webContents.send('request-login', {
         status: true,
         reason: 'success-with-otp',
       });
@@ -464,31 +484,35 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   dialog.showErrorBox('로그인 확인 실패!', `로그인이 된 것 같은데 확인이 안돼요 T.T
   개발자에게 이 상황을 자세히 설명해주시면 프로그램 개선에 도움이 됩니다!
   https://github.com/Paosder/gersang-supporter/issues`);
-  mainWindow.webContents.send('response-logout', {
+  mainWindow.webContents.send('request-logout', {
     status: false,
     reason: 'fail-with-otp',
   });
+  closeIE(currentIndex);
 });
 
 interface LogoutArgs {
-  index: number;
-  forced?: boolean;
+  forced: boolean;
+  index?: number;
 }
 
 ipcMain.on('request-logout', (event, args: LogoutArgs) => {
   mainWindow.setProgressBar(0);
   if (args.forced) {
-    mainWindow.webContents.send('response-logout', {
+    mainWindow.webContents.send('request-logout', {
       error: true,
       reason: 'cancel-otp',
     });
     dialog.showErrorBox('OTP 취소!', 'OTP 인증을 취소하였습니다.');
+    logoutUser(currentIndex);
+    closeIE(currentIndex);
   } else {
-    mainWindow.webContents.send('response-logout', {
+    mainWindow.webContents.send('request-logout', {
       error: false,
       reason: 'success-logout',
     });
     logoutUser(args.index);
+    closeIE(args.index);
   }
 });
 
@@ -531,7 +555,13 @@ ipcMain.on('execute-game', (event, cliArg: CliArg) => {
       }
       const document = IE[cliArg.index].Document;
       if (document) {
-        document.parentWindow.execScript('gameStart(1)');
+        try {
+          document.parentWindow.execScript('gameStart(1)');
+        } catch {
+          dialog.showErrorBox('게임 실행 실패!',
+            `거상 ActiveX가 설치 되어있지 않은 것 같아요.
+          수동으로 1회 실행한 후 다시 시도해주세요.`);
+        }
       } else {
         dialog.showErrorBox('게임 실행 실패!',
           `로그인이 정상적으로 되지 않았거나, 홈페이지가 이상합니다. T.T

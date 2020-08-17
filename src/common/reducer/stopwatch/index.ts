@@ -2,8 +2,9 @@ import { Reducer } from 'redux';
 // import { NotificationIcon } from '@common/icons';
 import {
   StopWatchActions, SET_BASE_TIME,
-  INCREASE_ELAPSED_TIME, SET_STATUS, StopWatchState,
+  INCREASE_ELAPSED_TIME, SET_STATUS,
 } from './action';
+import { StopWatchState } from './types';
 
 const initState = (): StopWatchState => ({
   baseTime: Date.now(),

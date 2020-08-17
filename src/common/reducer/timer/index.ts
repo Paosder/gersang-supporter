@@ -2,8 +2,9 @@ import { Reducer } from 'redux';
 import { NotificationIcon } from '@common/icons';
 import {
   TimerActions, SET_LEFT_TIME,
-  DECREASE_LEFT_TIME, SET_STATUS, TimerState,
+  DECREASE_LEFT_TIME, SET_STATUS,
 } from './action';
+import { TimerState } from './types';
 
 const initState = (): TimerState => ({
   leftTime: 0,

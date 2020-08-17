@@ -1,8 +1,9 @@
 import { Reducer } from 'redux';
 import {
-  EnumLoginState, MainActions, LoginState,
+  MainActions,
   REINIT_ACTIVE_CLIENTS, SET_STATUS,
 } from './action';
+import { EnumLoginState, LoginState } from './types';
 
 
 const initState = (): LoginState => ({
