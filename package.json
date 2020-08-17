@@ -32,7 +32,8 @@
     "build:win64": "electron-builder build --win --x64",
     "build:front": "craco build",
     "build:native": ".\\node_modules\\.bin\\electron-rebuild.cmd",
-    "build": "cross-env NODE_ENV=production yarn electron:build && yarn build:front && yarn build:win64",
+    "build": "cross-env NODE_ENV=production yarn electron:build && yarn build:front && yarn build:win64 && yarn copy:yml",
+    "copy:yml": "copyfiles -f \"./release/latest.yml\" \"./\"",
     "test": "craco test"
   },
   "build": {
