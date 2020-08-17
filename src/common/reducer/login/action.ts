@@ -1,7 +1,7 @@
 import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { reqGameExecute, reqLogin, registerCallback } from '@common/ipc/req';
-import { ipcRenderer, remote } from 'electron';
+import { remote } from 'electron';
 import { ConfigState } from '../config/types';
 import { EnumLoginState, LoginState } from './types';
 
