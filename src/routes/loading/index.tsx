@@ -13,31 +13,31 @@ const TransparentDiv = styled.div`
 `;
 
 const close = () => {
-  remote.getCurrentWindow().hide();
+  remote.getCurrentWindow().close();
 };
 
-const closeAfter2S = () => {
+const closeAfter3S = () => {
   setTimeout(() => {
     close();
-  }, 2000);
+  }, 3000);
 };
 
 const LoadingPage: React.FC = () => {
   useEffect(() => {
-    ipcRenderer.on('loading-screen', closeAfter2S);
+    ipcRenderer.on('loading-screen', closeAfter3S);
     setTimeout(() => {
       // workaround: transparent window not appears
-      // next time if close window immediately when after initialized.
-      close();
+      // next time if close window immediately after initialized.
+      closeAfter3S();
     }, 0);
     return () => {
-      ipcRenderer.off('loading-screen', closeAfter2S);
+      ipcRenderer.off('loading-screen', closeAfter3S);
     };
   }, []);
 
   return (
     <TransparentDiv onClick={close}>
-      <ProgressRing />
+      <ProgressRing dotsStyle={{ background: 'yellowgreen' }} />
     </TransparentDiv>
   );
 };
