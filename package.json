@@ -6,7 +6,7 @@
   "author": "Paosder",
   "dependencies": {
     "fs-jetpack": "^3.1.0",
-    "getmac": "^5.14.0",
+    "getmac": "^5.15.0",
     "lnk": "^1.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
