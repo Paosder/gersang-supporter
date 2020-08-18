@@ -2,6 +2,7 @@ import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { reqGameExecute, reqLogin, registerCallback } from '@common/ipc/req';
 import { remote } from 'electron';
+import { decrypt } from '@common/constant';
 import { ConfigState } from '../config/types';
 import { EnumLoginState, LoginState } from './types';
 
@@ -44,17 +45,21 @@ export const executeDirect = (index: number): ThunkAction<Promise<void>, {
     }
     case EnumLoginState.LOGOUT: {
       // not login state (first phase).
-      const { username, password } = configClients[index];
-      if (!username || !password) {
+      const { username: u, password: p } = configClients[index];
+
+      if (!u || !p) {
         remote.dialog.showErrorBox('아이디 비밀번호가 이상해요!', `
           아이디, 비밀번호가 이상해요!
           혹시 이전에 한번이라도 로그인을 안하셨던게 아닐까요?
 
-          인식된 아이디: '${username}'
-          인식된 비밀번호: '${password.split('').map(() => '●').join()}'
+          인식된 아이디: '${u}'
+          인식된 비밀번호: '${p.split('').map(() => '●').join()}'
         `);
         return;
       }
+      const { encrypted } = getState().config;
+      const username = encrypted ? decrypt(u) : u;
+      const password = encrypted ? decrypt(p) : p;
       reqLogin(index, username, password, (res: { status: boolean, reason: string}) => {
         if (res.status) {
           // true. go next stage.
@@ -70,6 +75,7 @@ export const executeDirect = (index: number): ThunkAction<Promise<void>, {
                 dispatch(executeDirect(index));
               });
             }
+            // else, it fails.
           });
         }
       });

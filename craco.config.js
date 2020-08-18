@@ -4,6 +4,7 @@ const {
 } = require('@craco/craco');
 const webpack = require('webpack');
 const path = require('path');
+const json = require('./package.json');
 
 module.exports = {
   reactScriptsVersion: 'react-scripts',
@@ -11,6 +12,7 @@ module.exports = {
     plugins: [
       new webpack.DefinePlugin({
         'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+        'process.env.VERSION': JSON.stringify(json.version),
       }),
     ],
     configure: (webpackConfig, { env, paths }) => {
