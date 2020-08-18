@@ -7,7 +7,7 @@
       "username": "",
       "password": "",
       "path": "C:\\AKInteractive\\Gersang",
-      "alwaysSave": "false",
+      "alwaysSave": "true",
       "alwaysRestore": "true"
     },
     {
@@ -15,7 +15,7 @@
       "username": "",
       "password": "",
       "path": "C:\\AKInteractive\\Gersang2",
-      "alwaysSave": "false",
+      "alwaysSave": "true",
       "alwaysRestore": "true"
     },
     {
@@ -23,7 +23,7 @@
       "username": "",
       "password": "",
       "path": "C:\\AKInteractive\\Gersang3",
-      "alwaysSave": "false",
+      "alwaysSave": "true",
       "alwaysRestore": "true"
     },
     {
@@ -31,7 +31,7 @@
       "username": "",
       "password": "",
       "path": "C:\\AKInteractive\\Gersang4",
-      "alwaysSave": "false",
+      "alwaysSave": "true",
       "alwaysRestore": "true"
     }
   ]
