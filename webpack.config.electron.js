@@ -1,6 +1,8 @@
 const path = require('path');
+const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const TerserPlugin = require('terser-webpack-plugin');
+const json = require('./package.json');
 
 const mode = process.env.NODE_ENV === 'development' ? 'development' : 'production';
 const optimized = mode === 'production';
@@ -31,6 +33,12 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+      'process.env.VERSION': JSON.stringify(json.version),
+    }),
+  ],
   devtool: 'source-map',
   target: 'electron-main',
   resolve: {

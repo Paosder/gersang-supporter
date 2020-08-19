@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  app, BrowserWindow, ipcMain, Menu, Tray, dialog, screen,
+  app, BrowserWindow, ipcMain, Menu, Tray, dialog, screen, shell,
 } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
@@ -8,6 +8,9 @@ import fs from 'fs';
 import * as regedit from 'regedit';
 import { U } from 'win32-api';
 import dns from 'dns';
+import https from 'https';
+import YAML from 'yaml';
+import semver from 'semver';
 import copy from './copy-content';
 
 // ///////////////////////////////////////////////////////
@@ -25,6 +28,55 @@ dns.promises.lookup('google.com').catch(() => {
   closeIE();
   process.exit(0);
 });
+
+// ///////////////////////////////////////////////////////
+// Check version via download github raw data ------------
+
+const checkVersion = () => {
+  https.get('https://raw.githubusercontent.com/Paosder/gersang-supporter/master/latest.yml', (res) => {
+    if (res.statusCode && res.statusCode === 200) {
+      res.on('data', (d: Buffer) => {
+        const parsed = YAML.parse(d.toString('utf-8'));
+        const verCompare = semver.compare(parsed.version, process.env.VERSION);
+        if (verCompare > 0) {
+          // latest version has been arrived.
+          dialog.showMessageBox(mainWindow, {
+            title: '최신 버전 확인!',
+            type: 'question',
+            message: `업데이트가 있습니다: ${parsed.version}
+업데이트 하러 갈까요? :)`,
+            buttons: ['네', '아뇨, 그냥 쓸게요.'],
+          }).then((clickRes) => {
+            if (clickRes.response === 0) {
+              // show download link.
+              shell.openPath(`https://github.com/Paosder/gersang-supporter/releases/tag/v${parsed.version}`);
+            }
+          });
+        } else if (verCompare === 0) {
+          // this version is latest version.
+        } else {
+          // this version is next version.
+          dialog.showMessageBox(mainWindow, {
+            title: '테스트 버전 동작 중!',
+            type: 'info',
+            message: `해당 버전은 개발 버전입니다: ${process.env.VERSION}.
+기능 등이 정상적으로 동작하지 않을 수 있습니다!`,
+          });
+        }
+      });
+    } else {
+      dialog.showErrorBox('버전 확인 에러!',
+        `최신 버전을 확인 할 수 없습니다!
+혹시 인터넷이 연결되어 있지 않거나, github에 접속할 수 없나요? T.T`);
+    }
+  }).on('error', (e) => {
+    dialog.showErrorBox('버전 확인 중 에러!',
+      `버전 확인 중 오류가 발생했습니다: ${e.name}
+개발자에게 문의주세요!`);
+  });
+};
+
+
 
 // ///////////////////////////////////////////////////////
 // Load user32 ---------------------
@@ -246,6 +298,7 @@ const main = () => {
 
   // close background IE when app close
   mainWindow.on('close', closeIE);
+  checkVersion();
 };
 
 app.on('ready', main);

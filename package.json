@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.paths",
   "name": "gersang-supporter",
-  "version": "1.0.0-alpha-6",
+  "version": "1.0.0-alpha-7",
   "private": true,
   "author": "Paosder",
   "dependencies": {
@@ -17,9 +17,11 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "regedit": "^3.0.3",
+    "semver": "^7.3.2",
     "styled-components": "^5.1.1",
     "win32-api": "^9.5.0",
-    "winax": "^1.20.0"
+    "winax": "^1.20.0",
+    "yaml": "^1.10.0"
   },
   "homepage": "./",
   "scripts": {
