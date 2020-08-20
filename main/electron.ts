@@ -76,8 +76,6 @@ const checkVersion = () => {
   });
 };
 
-
-
 // ///////////////////////////////////////////////////////
 // Load user32 ---------------------
 
@@ -116,6 +114,14 @@ if (process.env.NODE_ENV !== 'development') {
 // IE Communications using ActiveX -----------------------
 
 require('winax');
+
+// // ///////////////////////////////////////////////////////
+// // File change detector ----------------------------------
+
+// const watcher = chokidar.watch('file, dir, glob, or array', {
+//   // ignored: /(^|[\/\\])\../, // ignore dotfiles
+//   persistent: true,
+// });
 
 // ///////////////////////////////////////////////////////
 // common const ----------------------------------------

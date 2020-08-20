@@ -15,6 +15,8 @@ export const CONFIG_RELOAD = '@CONFIG/RELOAD' as const;
 
 export const SET_USERINFO = '@CONFIG/SET_USERINFO' as const;
 
+export const SET_DIRTY = '@CONFIG/SET_DIRTY' as const;
+
 export const setAutoSave = (checked: boolean,
   index: number): ThunkAction<Promise<void>, {
     config: ConfigState
@@ -95,6 +97,13 @@ export const saveConfig = ({
     });
 };
 
+export const setDirty = (index: number) => ({
+  type: SET_DIRTY,
+  payload: {
+    index,
+  },
+});
+
 export const configReload = () => ({
   type: CONFIG_RELOAD,
 });
@@ -136,4 +145,4 @@ export type ConfigActions = {
   }
 } | {
   type: typeof CONFIG_RELOAD,
-};
+} | ReturnType<typeof setDirty>;

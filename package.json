@@ -1,10 +1,11 @@
 {
   "extends": "./tsconfig.paths",
   "name": "gersang-supporter",
-  "version": "1.0.0-alpha-7",
+  "version": "1.0.0-dev",
   "private": true,
   "author": "Paosder",
   "dependencies": {
+    "chokidar": "^3.4.2",
     "fs-jetpack": "^3.1.0",
     "getmac": "^5.15.0",
     "lnk": "^1.1.0",
@@ -98,7 +99,7 @@
     "eslint-config-airbnb": "^18.0.1",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-react-perf": "^3.2.3",
+    "eslint-plugin-react-perf": "^3.2.4",
     "nodemon": "^2.0.2",
     "react-scripts": "^3.4.3",
     "terser-webpack-plugin": "^2.3.2",

@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import IconButton from 'react-uwp/IconButton';
 import { ThemeProps } from 'react-uwp';
 import { useSelector, useDispatch } from 'react-redux';
+import chokidar from 'chokidar';
 import { GlobalState } from '@common/reducer';
 import { reqOpenConfig, buildTrayContextMenu } from '@common/ipc/req';
 import { executeDirect } from '@common/reducer/login/action';
@@ -70,6 +71,26 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
       ipcRenderer.off('execute-client', executeAccount);
     };
   }, [configClients, configClients.length, dispatch, loginClients.length]);
+
+  useEffect(() => {
+    // watch first client's path for detect file changes(usually update)
+    let watcher: chokidar.FSWatcher;
+    if (configClients[0].path !== '') {
+      watcher = chokidar.watch(configClients[0].path, {
+        // ignored: /(^|[\/\\])\../, // ignore dotfiles
+        persistent: true,
+      });
+      watcher.on('all', () => {
+        // detected file change in client path.
+
+      });
+    }
+
+    return () => {
+      watcher.close();
+    };
+
+  }, [configClients[0].path]); // eslint-disable-line
 
   return (
   <MainLayout>
