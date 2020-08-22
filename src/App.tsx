@@ -9,7 +9,7 @@ import { NotificationIcon } from '@common/icons';
 import { Provider } from 'react-redux';
 import reducer from '@common/reducer';
 import {
-  Main, Configuration, OTP, ClientGenerator, Loading,
+  Main, Configuration, OTP, ClientGenerator, Loading, CHCTest,
 } from './routes';
 import generateStore from './store';
 import './App.css';
@@ -42,6 +42,7 @@ const App: React.FC = () => (
           <Route path="/main" component={Main} />
           <Route path="/configuration" component={Configuration} />
           <Route path="/otp" component={OTP} />
+          <Route path="/chc-test" component={CHCTest} />
           <Route path="/loading" component={Loading} />
           <Route path="/client-generator" component={ClientGenerator} />
         </HashRouter>

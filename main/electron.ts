@@ -134,6 +134,8 @@ let configWindow: Electron.BrowserWindow;
 
 let ClientGeneratorWindow: Electron.BrowserWindow;
 
+let chcWindow: Electron.BrowserWindow;
+
 let otpWindow: Electron.BrowserWindow;
 
 let loadingWindow: Electron.BrowserWindow;
@@ -188,6 +190,28 @@ const openClientGeneratorWindow = () => {
   ClientGeneratorWindow.setMenu(null);
   const configUrl = `${baseUrl}#/client-generator`;
   ClientGeneratorWindow.loadURL(configUrl);
+};
+
+const openCHCWindow = () => {
+  chcWindow = new BrowserWindow({
+    width: 400,
+    height: 400,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    parent: mainWindow,
+    modal: true,
+    minimizable: true,
+    maximizable: true,
+    resizable: true,
+    icon: trayImg,
+  });
+  chcWindow.setMenu(null);
+  const configUrl = `${baseUrl}#/chc-test`;
+  chcWindow.loadURL(configUrl);
+  chcWindow.on('close', () => {
+    chcWindow = undefined;
+  });
 };
 
 const restoreFiles = [
@@ -651,6 +675,15 @@ ipcMain.on('change-config', (event, silent: boolean) => {
   if (configWindow) {
     configWindow.webContents.send('change-config'); // to close
     configWindow = null;
+  }
+});
+
+ipcMain.on('toggle-chc', () => {
+  if (!chcWindow) {
+    openCHCWindow();
+  } else {
+    chcWindow.close();
+    chcWindow = undefined;
   }
 });
 

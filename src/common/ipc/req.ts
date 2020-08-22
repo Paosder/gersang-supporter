@@ -60,6 +60,9 @@ export const reqOpenConfig = () => {
   ipcRenderer.send('open-configuration', '');
 };
 
+export const reqToggleCHC = () => {
+  ipcRenderer.send('toggle-chc', '');
+};
 interface TrayMenuInfo {
   clients: Array<{
     index: number;

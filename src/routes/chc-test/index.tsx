@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 `;
 
 const CHCLayout = styled.div`
-  backdrop-filter: blur(10px);
+  /* backdrop-filter: blur(10px); */
 `;
 // chinese test
 const ChineseTest: React.FC = () => (
