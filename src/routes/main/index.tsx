@@ -13,6 +13,7 @@ import { reqOpenConfig, buildTrayContextMenu } from '@common/ipc/req';
 import { executeDirect } from '@common/reducer/login/action';
 import LoginForm from './login';
 import Clock from './clock';
+import CHCTest from './chc-test';
 
 const MainLayout = styled.div`
   display: flex;
@@ -106,11 +107,13 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
               ClockLegacy
           </IconButton>
         </Link>
+        <Link to={`${match.url}/chc-test`}>
+          <IconButton>
+              CharactersLegacy
+          </IconButton>
+        </Link>
         {/* <IconButton>
             CalculatorLegacy
-        </IconButton>
-        <IconButton>
-            CharactersLegacy
         </IconButton> */}
         {/* <IconButton>
             ChatBubbles
@@ -125,6 +128,7 @@ const Main: React.FC<RouteComponentProps & ThemeProps> = ({ match, theme }) => {
     <Switch>
       <Route exact path={match.path} component={LoginForm} />
       <Route path={`${match.path}/clock`} component={Clock} />
+      <Route path={`${match.path}/chc-test`} component={CHCTest} />
     </Switch>
   </MainLayout>
   );
