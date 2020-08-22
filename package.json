@@ -31,7 +31,7 @@
     "electron:dev": "cross-env NODE_ENV=development webpack --config webpack.config.electron.js --watch",
     "electron:start-prod": "cross-env NODE_ENV=production electron ./build/electron.js",
     "electron:build": "webpack --config webpack.config.electron.js",
-    "start": "cross-env NODE_ENV=development ELECTRON_START_URL=http://localhost:3000 nodemon --watch public/electron.js --exec \"electron ./public/electron.js\"",
+    "start": "cross-env NODE_ENV=development ELECTRON_START_URL=http://localhost:3000 nodemon --watch public --exec \"electron ./public/electron.js\"",
     "build:win64": "electron-builder build --win --x64",
     "build:front": "craco build",
     "build:native": ".\\node_modules\\.bin\\electron-rebuild.cmd",

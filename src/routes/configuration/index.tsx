@@ -217,7 +217,9 @@ const Configuration: React.FC<ThemeProps> = ({ theme }) => {
         </Button>
         <Separator />
         <ProgramInfo>
-          프로그램 정보...
+          프로그램 정보:
+          {' '}
+          {process.env.VERSION}
         </ProgramInfo>
       </OptionLayout>
     </ConfigLayout>
