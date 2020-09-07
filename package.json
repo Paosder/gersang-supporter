@@ -19,7 +19,7 @@
     "redux-thunk": "^2.3.0",
     "regedit": "^3.0.3",
     "semver": "^7.3.2",
-    "styled-components": "^5.1.1",
+    "styled-components": "^5.2.0",
     "win32-api": "^9.5.0",
     "winax": "^1.20.0",
     "yaml": "^1.10.0"
