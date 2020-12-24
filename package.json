@@ -5,7 +5,7 @@
   "private": true,
   "author": "Paosder",
   "dependencies": {
-    "chokidar": "^3.4.2",
+    "chokidar": "^3.4.3",
     "fs-jetpack": "^3.1.0",
     "getmac": "^5.17.0",
     "lnk": "^1.1.0",
