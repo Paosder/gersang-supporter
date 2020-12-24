@@ -7,7 +7,7 @@
   "dependencies": {
     "chokidar": "^3.4.2",
     "fs-jetpack": "^3.1.0",
-    "getmac": "^5.16.0",
+    "getmac": "^5.17.0",
     "lnk": "^1.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
