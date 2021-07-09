@@ -100,7 +100,7 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-react-perf": "^3.3.0",
-    "nodemon": "^2.0.2",
+    "nodemon": "^2.0.11",
     "react-scripts": "^3.4.3",
     "terser-webpack-plugin": "^5.1.2",
     "ts-loader": "^8.0.4",
