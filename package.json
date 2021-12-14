@@ -1,10 +1,11 @@
 {
   "extends": "./tsconfig.paths",
   "name": "gersang-supporter",
-  "version": "1.0.0-alpha-7",
+  "version": "1.0.1",
   "private": true,
   "author": "Paosder",
   "dependencies": {
+    "chokidar": "^3.4.2",
     "fs-jetpack": "^3.1.0",
     "getmac": "^5.15.0",
     "lnk": "^1.1.0",
@@ -79,7 +80,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.8.3",
+    "@babel/core": "^7.11.4",
     "@babel/preset-typescript": "^7.8.3",
     "@craco/craco": "^5.6.3",
     "@types/node": "^14.0.27",
@@ -94,16 +95,16 @@
     "cross-env": "^7.0.2",
     "electron": "^9.2.1",
     "electron-builder": "^22.8.0",
-    "electron-rebuild": "^1.9.0",
+    "electron-rebuild": "^2.0.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-react-perf": "^3.2.3",
+    "eslint-plugin-react-perf": "^3.2.4",
     "nodemon": "^2.0.2",
     "react-scripts": "^3.4.3",
     "terser-webpack-plugin": "^2.3.2",
     "ts-loader": "^6.2.1",
-    "typescript": "~3.9.7",
+    "typescript": "~4.0.2",
     "webpack-cli": "^3.3.10",
     "webpack-node-externals": "^2.5.1"
   }

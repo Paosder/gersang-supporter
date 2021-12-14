@@ -76,8 +76,6 @@ const checkVersion = () => {
   });
 };
 
-
-
 // ///////////////////////////////////////////////////////
 // Load user32 ---------------------
 
@@ -116,6 +114,14 @@ if (process.env.NODE_ENV !== 'development') {
 // IE Communications using ActiveX -----------------------
 
 require('winax');
+
+// // ///////////////////////////////////////////////////////
+// // File change detector ----------------------------------
+
+// const watcher = chokidar.watch('file, dir, glob, or array', {
+//   // ignored: /(^|[\/\\])\../, // ignore dotfiles
+//   persistent: true,
+// });
 
 // ///////////////////////////////////////////////////////
 // common const ----------------------------------------
@@ -243,7 +249,7 @@ const closeIE = (index?: number) => {
 
 const logoutUser = (index: number) => {
   const document = IE[index].Document;
-  const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
+  const logout = document.querySelector('[href="/member/logoutProc.gs"]');
   if (logout) {
     logout.click();
   }
@@ -399,11 +405,11 @@ ipcMain.on('request-login', async (event, arg) => {
   IE[index].silent = true;
   currentIndex = index;
   try {
-    IE[index].navigate('http://www.gersang.co.kr/main.gs');
+    IE[index].navigate('http://www.gersang.co.kr/main/index.gs');
     await waitBusy(index);
     logoutUser(index);
     await waitBusy(index);
-    IE[index].navigate('http://www.gersang.co.kr/pub/logi/login/login.gs?returnUrl=www.gersang.co.kr%2Fmain.gs');
+    IE[index].navigate('http://www.gersang.co.kr/member/login.gs');
     await waitBusy(index);
   } catch (e) {
     dialog.showErrorBox('IE 오류!',
@@ -419,17 +425,17 @@ ipcMain.on('request-login', async (event, arg) => {
   mainWindow.setProgressBar(0.2);
 
   const document = IE[index].Document;
-  const t = document.querySelector('[name=GSuserID]');
-  const p = document.querySelector('[name=GSuserPW]');
+  const t = document.querySelector('[id=GSuserID]');
+  const p = document.querySelector('[id=GSuserPW]');
   try {
-    t.innerText = id;
-    p.innerText = password;
+    t.value = id;
+    p.value = password;
     mainWindow.setProgressBar(0.5);
   } catch (e) {
     dialog.showErrorBox('로그인 오류!',
       `로그인 중 알 수 없는 문제가 발생했습니다.
 홈페이지가 정상적이지 않을 수도 있습니다.
-해당 증상이 반복될 경우 https://github.com/Paosder/gersang-supporter/issues 으로 문의주시면 감사하겠습니다.`);
+해당 증상이 반복될 경우 https://github.com/Paosder/gersang-supporter/issues 으로 문의주시면 감사하겠습니다.${e}`);
     event.reply('request-logout', {
       error: true,
       reason: 'login-failed',
@@ -440,7 +446,7 @@ ipcMain.on('request-login', async (event, arg) => {
   }
 
   // document.querySelector('[src="/image/main/start_btn.png"]').click();/image/sign/bt_login.gif
-  document.querySelector('[src="/image/main/bt_login.gif"]').click();
+  document.querySelector('[id=btn_Login]').click();
 
   try {
     await waitBusy(index);
@@ -482,9 +488,9 @@ ipcMain.on('request-login', async (event, arg) => {
     otpWindow.loadURL(otpUrl);
     mainWindow.setProgressBar(0.75);
   } else {
-    IE[index].navigate('http://www.gersang.co.kr/main.gs');
+    IE[index].navigate('http://www.gersang.co.kr/main/index.gs');
     await waitBusy(index);
-    const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
+    const logout = document.querySelector('[href="/member/logoutProc.gs"]');
     if (logout) {
       event.reply('request-login', {
         status: true,
@@ -505,9 +511,9 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   // remoteAlert();
   const document = IE[currentIndex].Document;
 
-  const otp = document.querySelector('[name=GSotpNo]');
-  otp.innerText = otpData;
-  document.querySelector('[src="/image/board/bt_le_ok.gif"]').click();
+  const otp = document.querySelector('[id=GSotpNo]');
+  otp.value = otpData;
+  document.querySelector('[id=btn_Send]').click();
   try {
     await waitBusy(currentIndex);
   } catch {
@@ -522,9 +528,9 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
   }
   for (let i = 0; i < 3; i += 1) {
     // cross check (occationally fails at first time)
-    IE[currentIndex].navigate('https://www.gersang.co.kr/main.gs');
+    IE[currentIndex].navigate('https://www.gersang.co.kr/main/index.gs');
     await waitBusy(currentIndex); // eslint-disable-line
-    const logout = document.querySelector('[src="/image/main/txt_logout.gif"]');
+    const logout = document.querySelector('[href="/member/logoutProc.gs"]');
     if (logout) {
       mainWindow.webContents.send('request-login', {
         status: true,
@@ -541,7 +547,7 @@ ipcMain.on('request-otp', async (event, otpData: string) => {
     status: false,
     reason: 'fail-with-otp',
   });
-  closeIE(currentIndex);
+  // closeIE(currentIndex);
 });
 
 interface LogoutArgs {
