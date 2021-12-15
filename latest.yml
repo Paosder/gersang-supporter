@@ -1,8 +1,8 @@
-version: 1.0.1
+version: 1.0.2
 files:
-  - url: Gersang-Supporter-Setup-1.0.1.exe
-    sha512: MACOrk4MO1UUH2n+YcdzvrF2TvWe8UbsZ+/Hv0sw9xM2cAPq/fqqhCmYwk4Uo9nhrYkto7Q571L+yW7OTF/KCQ==
-    size: 55051605
-path: Gersang-Supporter-Setup-1.0.1.exe
-sha512: MACOrk4MO1UUH2n+YcdzvrF2TvWe8UbsZ+/Hv0sw9xM2cAPq/fqqhCmYwk4Uo9nhrYkto7Q571L+yW7OTF/KCQ==
-releaseDate: '2021-12-14T11:55:47.376Z'
+  - url: Gersang-Supporter-Setup-1.0.2.exe
+    sha512: kwID2ueXaYgfY7PA2pBZWdNSD+q0iW0lR75qu3YIp8Lt8+kDgZcueQ8iIk32aD4+FAnNI0Ly2Zpwb+1V+K4zQQ==
+    size: 55026964
+path: Gersang-Supporter-Setup-1.0.2.exe
+sha512: kwID2ueXaYgfY7PA2pBZWdNSD+q0iW0lR75qu3YIp8Lt8+kDgZcueQ8iIk32aD4+FAnNI0Ly2Zpwb+1V+K4zQQ==
+releaseDate: '2021-12-15T12:26:53.536Z'
