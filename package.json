@@ -93,7 +93,7 @@
     "concurrently": "^5.0.2",
     "copyfiles": "^2.1.1",
     "cross-env": "^7.0.2",
-    "electron": "^9.2.1",
+    "electron": "^11.5.0",
     "electron-builder": "^22.8.0",
     "electron-rebuild": "^2.0.0",
     "eslint-config-airbnb": "^18.0.1",
